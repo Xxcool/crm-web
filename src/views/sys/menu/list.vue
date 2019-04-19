@@ -127,6 +127,7 @@
           }
 
           this.data = response.data
+          console.log(this.data)
           this.loading = false
         }).catch(() => {
           this.loading = false

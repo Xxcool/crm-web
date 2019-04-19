@@ -92,6 +92,7 @@
           this.loading=true;
           api.tree().then(res=>{
               this.data=res.data;
+            console.log(this.data);
               this.loading=false
           }).catch(()=>{
               this.loading=false
@@ -105,7 +106,6 @@
           this.loading=true;
           orgApi.tree().then(res=>{
             this.orgTree=res.data;
-            console.log(this.orgTree);
             this.loading=false
           }).catch(()=>{
             this.loading=false

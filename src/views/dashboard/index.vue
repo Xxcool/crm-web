@@ -1,61 +1,6 @@
 <template>
   <div>
     <el-row :gutter="10">
-      <el-col :span="10">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span><i class="el-icon-date"></i> 待处理事务</span>
-          </div>
-          <div class="content">
-            <el-form>
-              <el-form-item label="未处理订单" class="">
-                <span class="status-1">2363个</span>
-              </el-form-item>
-              <el-form-item label="超过45天未发货订单" class="">
-                <span class="status-1">3587个</span>
-              </el-form-item>
-              <el-form-item label="超过20天未到账代结算验货单" class="">
-                <span class="status-1">499个</span>
-              </el-form-item>
-            </el-form>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :span="14">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span><i class="el-icon-edit-outline"></i> 今日业务量</span>
-          </div>
-          <div class="content">
-            <el-form>
-              <el-row :gutter="10">
-                <el-col :span="12">
-                  <el-form-item label="今日订单量" class="">
-                    <span class="status-1">2363个</span>
-                  </el-form-item>
-                  <el-form-item label="待付款订单" class="">
-                    <span class="status-1">3587个</span>
-                  </el-form-item>
-                  <el-form-item label="已付款待发货订单" class="">
-                    <span class="status-1">499个</span>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="12">
-                  <el-form-item label="今日新增会员" class="">
-                    <span class="status-1">2363个</span>
-                  </el-form-item>
-                  <el-form-item label="昨日订单量" class="">
-                    <span class="status-1">3587个</span>
-                  </el-form-item>
-                  <el-form-item label="昨日成交订单" class="">
-                    <span class="status-1">499个</span>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-            </el-form>
-          </div>
-        </el-card>
-      </el-col>
       <el-col :span="24">
         <el-card class="box-card" style="margin-top: 10px">
           <el-collapse v-model="activeNames">
