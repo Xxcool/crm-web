@@ -1,0 +1,152 @@
+@import "./element-ui.scss";
+@import "./transition.scss";
+
+html, body {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+*, *:before, *:after {
+  outline: none;
+}
+
+.clear:after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  clear: both;
+}
+
+.view-main {
+  .tools {
+    margin-bottom: 10px;
+  }
+
+  .container {
+    margin-top: 10px;
+  }
+
+  .el-form {
+    &:not(.el-form--inline) {
+      .el-input {
+        max-width: 280px;
+      }
+    }
+
+    &.el-form--inline {
+      .el-input {
+        max-width: 140px;
+      }
+    }
+  }
+}
+
+.iconfont {
+  speak: none;
+  font-style: normal;
+  font-size: inherit;
+  font-weight: 400;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  vertical-align: baseline;
+  display: inline-block;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-uploader .avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 150px;
+  height: 150px;
+  line-height: 150px;
+  text-align: center;
+}
+
+.avatar-uploader .avatar {
+  width: 150px;
+  vertical-align: middle;
+}
+
+.red {
+  color: red;
+}
+
+.el-word-aux {
+  font-size: 12px;
+  color: #909399;
+  margin-left: 10px;
+}
+
+.ta-center {
+  text-align: center;
+}
+
+// 未审核
+.status-0 {
+  color: #d87300;
+}
+
+// 已审核
+.status-1 {
+  color: #38a900;
+}
+
+// 审核不通过
+.status-2 {
+  color: #ec2222;
+}
+
+img {
+  max-width: 100%;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.nowrap {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.el-popover {
+  padding: 8px;
+
+  p {
+    margin: 0;
+    max-width: 400px;
+    word-wrap: break-word;
+  }
+}
+
+.inline-text{
+  font-size: 12px;
+  color: #606266;
+  margin:0 10px;
+}
+
+.info-title{
+  line-height: 2;
+  margin-bottom: 10px;
+}

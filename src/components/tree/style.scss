@@ -1,0 +1,107 @@
+.tree-list {
+  list-style-type: none;
+  font-size: 14px;
+  padding-left: 14px;
+  margin: 0;
+  line-height: 1;
+  overflow: hidden;
+  transition: transform .3s ease-in-out;
+
+  .item-wrapper {
+    padding: 6px;
+    &:hover{
+      background-color: #f5f7fa;
+    }
+  }
+
+  .item-bold {
+    font-weight: bold
+  }
+
+  .item-toggle,
+  .item-checkbox,
+  .item-label {
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  .item-label {
+    padding-left: 4px;
+  }
+
+  .item-toggle {
+    width: 14px;
+    text-align: center;
+    overflow: hidden
+  }
+}
+
+.tree-icon-arrow {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  &:after {
+    display: block;
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 0;
+    height: 0;
+    border-width: 4px 0 4px 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent #c0c4cc;
+    transition: transform .3s ease-in-out;
+  }
+}
+
+.arrow-right:after {
+  transform: rotate(0);
+}
+
+.arrow-down:after {
+  transform: rotate(90deg);
+}
+
+.item-checkbox {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  border: 1px solid #dcdfe6;
+  border-radius: 2px;
+  &:hover {
+    border-color: #409EFF;
+  }
+}
+
+.item-checkbox:after {
+  display: block;
+  content: "";
+  position: absolute;
+}
+
+.tree-minus-square:after {
+  top: 5px;
+  left: 3px;
+  width: 6px;
+  height: 2px;
+  background-color: #333;
+}
+
+.tree-check-square:after {
+  top: 2px;
+  left: 2px;
+  width: 5px;
+  height: 3px;
+  transform: rotate(-45deg);
+  border-width: 0 0 2px 2px;
+  border-style: solid;
+  border-color: transparent transparent #333 #333;
+}
+
+.tree-square {
+  background-color: #ffffff;
+}
