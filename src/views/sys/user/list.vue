@@ -1,5 +1,24 @@
 <template>
   <div>
+    <div>
+      <el-row type="flex" justify="end">
+        <el-form :inline=true >
+          <el-form-item label="姓名">
+            <el-input   v-model="filter.params.name"></el-input>
+          </el-form-item>
+          <el-form-item label="角色" prop="roleId">
+            <el-select v-model="filter.params.roleId" clearable >
+              <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button type="primary" @click="loadData">搜索</el-button>
+          </el-form-item>
+
+        </el-form>
+      </el-row>
+    </div>
     <el-table
       :data="tableData"
       border
@@ -28,7 +47,7 @@
             <span v-if="scope.row.status===1">
               启用
             </span>
-            <span v-if="scope.row.status===0">
+          <span v-if="scope.row.status===0">
               未启用
             </span>
         </template>
@@ -50,19 +69,22 @@
 
 <script>
   import api from "../../../api/sys/user"
+  import role from "../../../api/sys/role"
 
   export default {
     name: "user_list",
     data() {
       return {
         tableData: [],
+        roles: [],
         filter: {
           count: 10, // 页大小
           page: 1, // 当前页
           sorts: '',
           order: '',
           params: {
-            // 自定义参数
+            name:"",
+            roleId:""
           }
         },
         total: 0,
@@ -82,6 +104,10 @@
         }).catch(() => {
           this.loading = false
         })
+        role.selectAll().then(res => {
+          this.roles = res.data;
+        }).catch(() => {
+        });
       },
       handleDel(row) {
         this.$confirm('是否删除来源【' + row.name + '】?', '提示', {
