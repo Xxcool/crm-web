@@ -4,7 +4,9 @@
       <el-button type="primary" @click="handleCreate">添加</el-button>
     </div>
     <div class="container">
-      <tree-table :data="data" :columns="columns" border :loading="loading">
+      <el-table :data="data" border row-key="code" :loading="loading">
+        <el-table-column v-for="item in columns" :key="item.id" :label="item.text" :prop="item.value">
+        </el-table-column>
           <el-table-column label="操作" width="210">
             <template slot-scope="scope">
               <el-button type="success" @click="handleCreate(scope.row)">添加</el-button>
@@ -12,7 +14,7 @@
               <el-button type="danger" @click="handleDel(scope.row)">删除</el-button>
             </template>
           </el-table-column>
-      </tree-table>
+      </el-table>
     </div>
 
     <el-dialog :title="dialogTitle[dialogType]" :visible.sync="dialogFormVisible">
@@ -45,11 +47,10 @@
     import api from "../../../api/sys/job"
     import orgApi from "../../../api/sys/org"
     import selectTree from '../../../components/selectTree/index.vue'
-    import treeTable from '../../../components/treeTable'
 
     export default {
       name:'job_list',
-      components: {treeTable,selectTree},
+      components: {selectTree},
       data(){
         return{
           loading:true,
