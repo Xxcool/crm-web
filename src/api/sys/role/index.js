@@ -53,5 +53,11 @@ export default {
     return request({
       url: "/api/sys/role/update-role-menu/" + id + "?ids=" + menuIds.join(",")
     })
+  },
+  selectAll() {
+    return request({
+      url: "/api/sys/role/selectAll",
+      method: "post"
+    })
   }
 }

@@ -21,10 +21,10 @@
               <el-radio :label="0">不启用</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="选择角色" prop="roles">
-            <el-checkbox-group v-model="form.roles">
-              <el-checkbox v-for="item in roles" :key="item.id" :label="item.id">{{item.name}}</el-checkbox>
-            </el-checkbox-group>
+          <el-form-item label="选择角色" prop="roleId">
+            <el-select v-model="form.roleId">
+              <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="选择部门：" prop="orgCode">
             <select-tree v-model="form.orgCode" :options="orgTree"
@@ -73,7 +73,7 @@
           email:"",
           status: 1,
           orgCode:'',
-          roles: [],
+          roleId: "",
         },
         orgTree:[],
         roles: [],
@@ -81,6 +81,7 @@
         rules: {
           name: [{required: true, message: '不能为空', trigger: 'change'}],
           email: [{required: true, message: '不能为空', trigger: 'change'}],
+          roleId: [{required: true, message: '不能为空', trigger: 'change'}],
           password: [{trigger: "change", min: 6, message: "密码最少6位"}],
           password_2: [{trigger: "change", validator: validatePassword_2}],
         }
@@ -91,7 +92,7 @@
     },
     methods: {
       loadData() {
-        role.findListById(0).then(res => {
+        role.selectAll().then(res => {
           this.roles = res.data;
         }).catch(() => {
         });
@@ -104,34 +105,16 @@
           api.userDetail(this.$route.query.id).then(res => {
             res.data.password = "";
             this.form = {...this.form, ...res.data};
-            let roles = []
-            this.form.roles.forEach((item) => {
-              roles.push(item.id)
-            })
-
-            this.form.roles = roles
           }).catch(() => {
           })
         }
       },
       onSubmit() {
-        this.$refs.dataForm.validate((valid) => {
-          if (valid) {
-            let data = {...this.form}
-            let roles = []
-            this.form.roles.forEach((item) => {
-              roles.push({id: item})
-            })
-            data.roles = roles
-            api.save(data).then(() => {
-              this.$message.success("保存成功")
-              this.handleCancel(true)
-            }).catch(() => {
-            })
-          } else {
-            return false;
-          }
-        });
+        api.save(this.form).then(() => {
+          this.$message.success("保存成功")
+          this.handleCancel(true)
+        }).catch(() => {
+        })
       },
       handleCancel(state) {
         this.$store.dispatch("delView", this.$route).then(() => {

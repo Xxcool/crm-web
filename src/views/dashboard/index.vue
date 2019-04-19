@@ -5,13 +5,6 @@
         <el-card class="box-card" style="margin-top: 10px">
           <el-collapse v-model="activeNames">
             <el-collapse-item title="demo" name="1">
-              <tree v-model="checkedIds" :tree-data="treeData" :options="options"></tree>
-              <el-button @click="supplierDialogVisible=true">商家通用选择弹框示例</el-button>
-              <el-row>
-                <div>商家选择框返回结果</div>
-                {{supplierList}}
-              </el-row>
-              <supplier-dialog @confirm="callback" :visible.sync="supplierDialogVisible"></supplier-dialog>
               <div class="padding-10">
                 <el-form :inline=true>
                   <el-form-item label="搜索注册时间">
@@ -120,17 +113,12 @@
           depthOpen: 99
         },
         supplierDialogVisible: false,
-        supplierList: [],
         form: {
           data: ""
         }
       }
     },
-    methods: {
-      callback(data) {
-        this.supplierList = data
-      }
-    },
+
   }
 </script>
 
