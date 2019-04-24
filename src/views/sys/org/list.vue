@@ -22,6 +22,17 @@
         <el-form-item label="机构名称" prop="name">
           <el-input v-model="temp.name"/>
         </el-form-item>
+        <el-form-item label="客户标签">
+          <el-tree
+            ref="tagTree"
+            :data="tagList"
+            show-checkbox
+            node-key="code"
+            :default-checked-keys="tagCodes"
+            :props="props">
+          </el-tree>
+        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -33,6 +44,7 @@
 
 <script>
   import api from "../../../api/sys/org"
+  import tag from "../../../api/sys/tag"
 
   export default {
     name: 'menu_list',
@@ -46,6 +58,11 @@
           }
         ],
         data: [],
+        tagList:[],
+        tagCodes:[],
+        props:{
+          label:"name"
+        },
         dialogTitle: {
           edit: '修改',
           create: '添加'
@@ -55,7 +72,8 @@
         temp: {
           code: null,
           name: "",
-          parentCode: null
+          parentCode: null,
+          tagCodes:[]
         },
         menuTypes: ["菜单", "按钮"],
         rules: {
@@ -87,6 +105,10 @@
         })
       },
       handleCreate(row) {
+        tag.getOrgTagTree(row.code).then(res=>{
+          this.tagList=res.data;
+          this.tagCodes=[];
+        });
        this.dialogFormVisible = true
         this.dialogType = "create"
         this.temp = {
@@ -99,6 +121,17 @@
         }
       },
       handleUpdate(row) {
+        tag.getOrgTagTree(row.code).then(res=>{
+          this.tagList=res.data;
+          let tagCodes=[];
+          for (let i=0;i<this.tagList.length;i++){
+            let tag=this.tagList[i];
+            if(tag.checked){
+              tagCodes.push(tag.code);
+            }
+          }
+          this.tagCodes=tagCodes;
+        });
         this.dialogFormVisible = true
         this.dialogType = "edit"
         this.temp = Object.assign({}, row)
@@ -144,6 +177,7 @@
         });
       },
       createData() {
+       this.temp.tagCodes=this.$refs.tagTree.getCheckedKeys();
         api.add(this.temp).then(() => {
           this.dialogFormVisible = false
           this.$message({
@@ -160,7 +194,7 @@
         })
       },
       updateData() {
-        console.log(this.temp)
+        this.temp.tagCodes=this.$refs.tagTree.getCheckedKeys();
         api.update(this.temp).then(() => {
           this.dialogFormVisible = false
           this.$message({

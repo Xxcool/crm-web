@@ -21,11 +21,12 @@
               <el-radio :label="0">不启用</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="选择角色" prop="roleId">
-            <el-select v-model="form.roleId">
-              <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id"></el-option>
-            </el-select>
+          <el-form-item label="选择角色" prop="roles">
+            <el-checkbox-group v-model="form.roles">
+              <el-checkbox v-for="item in roles" :key="item.id" :label="item.id">{{item.name}}</el-checkbox>
+            </el-checkbox-group>
           </el-form-item>
+
           <el-form-item label="选择部门：" prop="orgCode">
             <select-tree v-model="form.orgCode" :options="orgTree"
                          :props="{
@@ -73,7 +74,7 @@
           email:"",
           status: 1,
           orgCode:'',
-          roleId: "",
+          roles: [],
         },
         orgTree:[],
         roles: [],
@@ -92,10 +93,10 @@
     },
     methods: {
       loadData() {
-        role.selectAll().then(res => {
+        role.findListById(0).then(res => {
           this.roles = res.data;
         }).catch(() => {
-        });
+        })
         org.tree().then(res =>{
           this.orgTree=res.data;
         }).catch(()=>{
@@ -104,16 +105,34 @@
         if (this.$route.query.id) {
           api.userDetail(this.$route.query.id).then(res => {
             res.data.password = "";
+            console.log(res.data);
             this.form = {...this.form, ...res.data};
+            let roles=[];
+            this.form.roles.forEach((item)=>{
+              roles.push(item.id);
+            })
+            this.form.roles = roles;
           }).catch(() => {
           })
         }
       },
       onSubmit() {
-        api.save(this.form).then(() => {
-          this.$message.success("保存成功")
-          this.handleCancel(true)
-        }).catch(() => {
+        this.$refs.dataForm.validate((valid) => {
+          if(valid){
+            let data={...this.form};
+            let roles=[];
+            this.form.roles.forEach((item)=>{
+              roles.push({id:item});
+            })
+            data.roles=roles;
+            api.save(data).then(() => {
+              this.$message.success("保存成功")
+              this.handleCancel(true)
+            }).catch(() => {
+            })
+          }else{
+            return false;
+          }
         })
       },
       handleCancel(state) {
