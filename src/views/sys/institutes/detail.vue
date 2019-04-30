@@ -164,8 +164,8 @@
                   <div class="info-title"><span class="padding-rigth">{{item.created}}</span><span class="padding-rigth">录入人：{{item.entryPerson}}</span><span class="padding-rigth">跟踪行为：{{item.trackDoings}}</span><span class="padding-rigth">客户联系人：{{item.contactPerson}}</span></div>
                   <div class="info-title"><span class="padding-rigth">{{item.description}}</span></div>
                   <div class="info-title">
-                      <a class="padding-rigth" type="text" :value="item.img" :href="item.img">附件图片</a>
-                      <a class="padding-rigth" type="text" :value="item.attachment" :href="item.attachment">附件文件</a>
+                      <a class="padding-rigth" v-if="item.attachment" :value="item.img" :href="item.img">附件图片</a>
+                      <a class="padding-rigth" v-if="item.attachment" :value="item.attachment" :href="item.attachment">附件文件</a>
                   </div>
                 </el-card>
 
