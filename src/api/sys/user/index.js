@@ -29,6 +29,12 @@ export default {
       data
     })
   },
+  selectAll(){
+    return request({
+      url:'/api/user/select-all',
+      method:"post"
+    })
+  },
   changePassword(data) {
     return request({
       url: "/api/user/change-password",

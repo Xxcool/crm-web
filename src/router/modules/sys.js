@@ -95,6 +95,32 @@ const job={
   ]
 }
 
+const institutes={
+  path:"/institutes",
+  component:layout,
+  children:[
+    {
+      path:"list",
+      name:"institutes_list",
+      component:() => import("../../views/sys/institutes/list.vue"),
+      meta:{title:"院所客户",nav:"sys"}
+    },
+    {
+      path:"detail",
+      name:"institutes_detail",
+      component:() => import("../../views/sys/institutes/detail.vue"),
+      meta:{title:"客户跟踪",nav:"sys"}
+    },
+    {
+      path:"log",
+      name:"institutes_log",
+      component:() => import("../../views/sys/institutes/log.vue"),
+      meta:{title:"客户跟踪日志",nav:"sys"}
+    }
+
+  ]
+}
+
 export default [
-  menu, role, user,org,tag,job
+  menu, role, user,org,tag,job,institutes
 ]

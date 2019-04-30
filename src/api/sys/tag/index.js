@@ -48,6 +48,12 @@ export default {
     return request({
       url:"/api/tag/org-tag-tree/"+code
     })
+  },
+
+  findOrgTag(code){
+    return request({
+      url:"/api/tag/findOrgTag/"+code
+    })
   }
 
 }

@@ -28,10 +28,10 @@ export default {
       method: "get",
     })
   },
-  allList() {
+  allList(query) {
     return request({
-      url: "/api/sys/station/selectAll",
-      method: "get",
+      url: `/api/basic/station/allList?name=${query}`,
+      method: "post",
     })
   }
 

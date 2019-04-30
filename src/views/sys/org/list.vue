@@ -124,12 +124,14 @@
         tag.getOrgTagTree(row.code).then(res=>{
           this.tagList=res.data;
           let tagCodes=[];
-          for (let i=0;i<this.tagList.length;i++){
-            let tag=this.tagList[i];
+          for (let i=0;i<res.data.length;i++){
+            let tag=res.data[i];
             if(tag.checked){
               tagCodes.push(tag.code);
             }
+            tagCodes=tagCodes.concat(this.getCheckedTagCodes(tag))
           }
+          console.log(tagCodes);
           this.tagCodes=tagCodes;
         });
         this.dialogFormVisible = true
@@ -141,6 +143,19 @@
         if (this.temp.children) {
           delete this.temp.children;
         }
+      },
+      getCheckedTagCodes(tag){
+        let tagCodes=[];
+        if (tag.children && tag.children.length > 0) {
+          for (let i = 0; i < tag.children.length; i++) {
+            let orgTag = tag.children[i];
+            if(orgTag.checked){
+              tagCodes.push(orgTag.code);
+            }
+            tagCodes = tagCodes.concat(this.getCheckedTagCodes(orgTag))
+          }
+        }
+        return tagCodes;
       },
       dataCommit() {
         this.$refs.dataForm.validate(valid => {
