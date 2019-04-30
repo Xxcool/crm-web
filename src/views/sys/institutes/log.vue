@@ -40,14 +40,14 @@
         prop="img"
         label="附件图片">
         <template slot-scope="scope">
-          <a   :value="scope.row.img" :href="scope.row.img">附件图片</a>
+          <a v-if="scope.row.img" :value="scope.row.img" :href="scope.row.img">附件图片</a>
         </template>
       </el-table-column>
       <el-table-column
         prop="attachment"
         label="附件文件">
         <template slot-scope="scope">
-          <a   :value="scope.row.attachment" :href="scope.row.attachment">附件文件</a>
+          <a v-if="scope.row.attachment"  :value="scope.row.attachment" :href="scope.row.attachment">附件文件</a>
         </template>
       </el-table-column>
     </el-table>
