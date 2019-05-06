@@ -121,6 +121,32 @@ const institutes={
   ]
 }
 
+const supplier={
+  path:"/supplier",
+  component:layout,
+  children:[
+    {
+      path:"list",
+      name:"supplier_list",
+      component:() => import("../../views/sys/supplier/list.vue"),
+      meta:{title:"商家客户",nav:"sys"}
+    },
+    {
+      path:"detail",
+      name:"supplier_detail",
+      component:() => import("../../views/sys/supplier/detail.vue"),
+      meta:{title:"商家跟踪",nav:"sys"}
+    },
+    {
+      path:"log",
+      name:"supplier_log",
+      component:() => import("../../views/sys/supplier/log.vue"),
+      meta:{title:"商家跟踪日志",nav:"sys"}
+    }
+
+  ]
+}
+
 export default [
-  menu, role, user,org,tag,job,institutes
+  menu, role, user,org,tag,job,institutes,supplier
 ]

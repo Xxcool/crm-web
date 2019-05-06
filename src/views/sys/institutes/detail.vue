@@ -104,7 +104,7 @@
             </el-form-item>
             <br>
             <el-button @click="toOssContact"  type="primary">同步oss系统联系人</el-button>
-            <el-button   type="primary">导出联系人信息</el-button>
+            <el-button @click="exportContact"  type="primary">导出联系人信息</el-button>
             <el-button @click="handleCreate()"  type="primary">新增联系人</el-button>
             <el-button @click="goBack(true)">返回</el-button>
           </el-form>
@@ -580,6 +580,22 @@
           })
 
         }
+      },
+
+      exportContact(){
+        if(this.multipleSelection.length==0){
+          this.$message.warning("请选择导出的联系人");
+        }else{
+          let ids=[];
+          ids=this.getCheckedIds();
+          contact.download({url:'/api/client/institutes/contact/export-contact',data:ids,fileName:'导出联系人.xls'});
+        }
+      },
+
+      getCheckedIds(){
+        return this.multipleSelection.map(value => {
+           return value.id
+        })
       },
 
       handleUploadImgSuccess(res, file) {

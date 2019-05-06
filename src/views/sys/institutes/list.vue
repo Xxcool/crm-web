@@ -63,7 +63,7 @@
         </el-form-item>
         <br>
         <el-button @click="handleUpdateStatusByIds()"  type="primary">批量分配</el-button>
-        <el-button   type="primary">导出客户信息</el-button>
+        <el-button @click="exportInstitutes"  type="primary">导出客户信息</el-button>
         <el-button @click="handleCreate()"  type="primary">新增院所</el-button>
       </el-form>
     </div>
@@ -745,6 +745,16 @@
         }).catch(()=>{
 
         })
+      },
+
+      exportInstitutes(){
+        if(this.multipleSelection.length==0){
+          this.$message.warning("请选择导出的客户信息")
+        }else{
+          let ids=this.getSelectIds();
+          contact.download({url:'/api/client/institutes/export-institutes',data:ids,fileName:'导出客户.xls'});
+        }
+
       },
 
       viewDetail(val) {

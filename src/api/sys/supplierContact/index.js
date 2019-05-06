@@ -1,12 +1,12 @@
 
 import request from "../../../utils/request";
-import {Message} from "element-ui"
+import {Message} from "element-ui";
 
 export default {
 
   list(data){
     return request({
-      url:"/api/client/institutes/contact/list",
+      url:"/api/client/supplier/contact/list",
       method:"post",
       data
     })
@@ -14,22 +14,14 @@ export default {
 
   selectAll(id){
     return request({
-      url:"/api/client/institutes/contact/selectAll/"+id,
+      url:"/api/client/supplier/contact/selectAll/"+id,
       method:"post"
     })
   },
 
   add(data){
     return request({
-      url :data.id ==null ? "/api/client/institutes/contact/add" :"/api/client/institutes/contact/update",
-      method: "post",
-      data
-    })
-  },
-
-  addList(data){
-    return request({
-      url : "/api/client/institutes/contact/add-list",
+      url :data.id ==null ? "/api/client/supplier/contact/add" :"/api/client/supplier/contact/update",
       method: "post",
       data
     })
@@ -37,14 +29,13 @@ export default {
 
   ossMemberList(id){
     return request({
-      url : "/api/member/member/find-by-institutesId?institutesId="+id,
-      method: "post",
+      url : "/api/supplier/"+id,
     })
   },
 
   update(data){
     return request({
-      url:"/api/client/institutes/contact/update",
+      url:"/api/client/supplier/contact/update",
       method: "post",
       data
     })
@@ -52,7 +43,7 @@ export default {
 
   del(id){
     return request({
-      url:"/api/client/institutes/contact/del/"+id
+      url:"/api/client/supplier/contact/del/"+id
     })
   },
 
@@ -89,5 +80,4 @@ export default {
       }
     })
   }
-
 }
