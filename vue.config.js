@@ -14,8 +14,7 @@ module.exports = {
     open: true,
     proxy: {
       '/api': {
-        /*target:'http://180.76.116.7:12248', // 设置你调用的接口域名和端口号*/
-        target:'http://localhost:12248',
+        target:'http://180.76.116.7:12248', // 设置你调用的接口域名和端口号
         ws:false,
         changeOrigin: true // 跨域
       }
