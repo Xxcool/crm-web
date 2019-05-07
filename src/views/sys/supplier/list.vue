@@ -51,6 +51,7 @@
           <el-button type="primary" @click="loadData">搜索</el-button>
         </el-form-item>
         <br>
+        <el-button @click="downloadTemplate()">下载客户导入模板</el-button>
         <el-button  type="primary">批量导入</el-button>
         <el-button @click="exportSupplier"  type="primary">导出客户信息</el-button>
         <el-button @click="handleCreate()"  type="primary">新增商家</el-button>
@@ -342,6 +343,7 @@
   import store from '../../../store/index'
   import logApi from "../../../api/sys/supplierLog"
   import contact from "../../../api/sys/supplierContact"
+  import {downloadFile} from "../../../utils"
 
   export default {
     name: "list",
@@ -637,6 +639,12 @@
           let ids=this.getSelectIds();
           contact.download({url:'/api/client/supplier/export-supplier',data:ids,fileName:'导出客户.xls'});
         }
+      },
+
+      downloadTemplate() {
+        api.batchExcelTemplate().then((res) => {
+          downloadFile(res, "商家客户导入模板");
+        })
       },
 
       handleUploadImgSuccess(res, file) {

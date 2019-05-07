@@ -47,6 +47,7 @@ export default {
     })
   },
 
+
   download(params) {
     let data = params.data;
     request({

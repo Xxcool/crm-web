@@ -93,6 +93,15 @@ export default {
       {"id":4,"value":"研发型企业"},
       {"id":5,"value":"其他"},
     ]
+  },
+
+  batchExcelTemplate() {
+    return request({
+      url: "/api/client/supplier/batchExcelTemplate",
+      method: "get",
+      responseType: "blob"
+    })
   }
+
 
 }
