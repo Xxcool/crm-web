@@ -643,7 +643,7 @@
 
       downloadTemplate() {
         api.batchExcelTemplate().then((res) => {
-          downloadFile(res, "商家客户导入模板");
+          downloadFile(res.data, "商家客户导入模板");
         })
       },
 
