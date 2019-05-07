@@ -51,8 +51,18 @@
           <el-button type="primary" @click="loadData">搜索</el-button>
         </el-form-item>
         <br>
-        <el-button @click="downloadTemplate()">下载客户导入模板</el-button>
-        <el-button  type="primary">批量导入</el-button>
+        <div class="upload-btn-inline">
+          <el-button  @click="downloadTemplate()">下载客户导入模板</el-button>
+        </div>
+        <el-upload
+          class="upload-btn-inline"
+          action="/api/client/supplier/importSupplier"
+          multiple
+          :file-list="fileList"
+          :show-file-list="false"
+          :on-success="handleUploadSuccess">
+          <el-button  type="primary">批量导入</el-button>
+        </el-upload>
         <el-button @click="exportSupplier"  type="primary">导出客户信息</el-button>
         <el-button @click="handleCreate()"  type="primary">新增商家</el-button>
       </el-form>
@@ -350,6 +360,7 @@
     components: {selectTree},
     data() {
       return {
+        fileList:[],
         tableData: [],
         supplierData:[],
         rules:{
@@ -682,6 +693,28 @@
         } else if (res.status === 0) {
           this.log.attachment = res.data;
           console.log(file)
+        } else {
+          this.$message({
+            message: "上传文件失败",
+            type: "error",
+            duration: 5 * 1000
+          })
+        }
+      },
+
+      handleUploadSuccess(res) {
+        if (res.status === 1001) {
+          this.$message({
+            message: "登录过期，请重新登录",
+            type: "error",
+            duration: 5 * 1000
+          })
+          setTimeout(() => {
+            store.dispatch("logOut")
+          }, 5 * 1000)
+        } else if (res.status === 0) {
+          this.$message.success("成功")
+          this.loadData();
         } else {
           this.$message({
             message: "上传文件失败",
