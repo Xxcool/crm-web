@@ -36,7 +36,7 @@
     <el-dialog :title="dialogTitle[dialogType]" :visible.sync="dialogFormVisible" width="30%">
       <el-form ref="detailForm" :rules="rules" :model="temp" label-position="left" label-width="80px">
         <el-form-item label="角色名称" prop="name">
-          <el-input v-model="temp.name"/>
+          <el-input v-model="temp.name" maxlength="25"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -171,8 +171,8 @@
             let menu = res.data[i];
             if (menu.checked) {
               menuIds.push(menu.id);
-              menuIds = menuIds.concat(this.getCheckedMenuIds(menu))
             }
+            menuIds = menuIds.concat(this.getCheckedMenuIds(menu))
           }
           this.checkedIds = menuIds
         }).catch(() => {
@@ -222,12 +222,13 @@
       },
       getCheckedMenuIds(menu) {
         let menuIds = [];
-        if (menu.checked) {
-          if (menu.children && menu.children.length > 0) {
-            for (let i = 0; i < menu.children.length; i++) {
+        if (menu.children && menu.children.length > 0) {
+          for (let i = 0; i < menu.children.length; i++) {
               let sub = menu.children[i];
-              menuIds = menuIds.concat(this.getCheckedMenuIds(sub))
-            }
+              if (sub.checked) {
+                menuIds.push(sub.id);
+              }
+            menuIds = menuIds.concat(this.getCheckedMenuIds(sub))
           }
         }
         return menuIds

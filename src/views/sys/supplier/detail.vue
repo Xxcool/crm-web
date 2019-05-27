@@ -10,13 +10,13 @@
                   <span v-for="item in supplier.tagNames" :key="item" :value="item" style="padding-right: 10px">{{item}}</span>
                 </el-form-item>
                 <el-form-item label="客户类型">
-                  <span >院所客户</span>
+                  <span >商家客户</span>
                 </el-form-item>
-                <el-form-item label="院所名称">
+                <el-form-item label="商家名称">
                   <span >{{supplier.name}}</span>
                 </el-form-item>
-                <el-form-item label="院所描述">
-                  <span >{{supplier.description}}</span>
+                <el-form-item label="商家描述">
+                  <span >{{supplier.remark}}</span>
                 </el-form-item>
                 <el-form-item label="配送区">
                   <span v-for="item in supplier.stationNames" :key="item" class="padding-rigth">{{item}}</span>
@@ -30,12 +30,12 @@
                   <span v-for="item in supplier.tagNames"  :key="item" :value="item" style="padding-right: 10px" >{{item}}</span>
                 </el-form-item>
                 <el-form-item label="客户类型">
-                  <span >院所客户</span>
+                  <span >商家客户</span>
                 </el-form-item>
                 <el-form-item label="客户名称">
                   <el-input  v-model="supplier.name"></el-input>
                 </el-form-item>
-                <el-form-item label="院所描述">
+                <el-form-item label="商家描述">
                   <el-input type="textarea" v-model="supplier.description" style="width: 80%"></el-input>
                 </el-form-item>
 
@@ -146,7 +146,7 @@
                   <div class="info-title"><span class="padding-rigth">{{item.created}}</span><span class="padding-rigth">录入人：{{item.entryPerson}}</span><span class="padding-rigth">跟踪行为：{{item.trackDoings}}</span><span class="padding-rigth">客户联系人：{{item.contactPerson}}</span></div>
                   <div class="info-title"><span class="padding-rigth">{{item.description}}</span></div>
                   <div class="info-title">
-                    <a class="padding-rigth" v-if="item.attachment" :value="item.img" :href="item.img">附件图片</a>
+                    <a class="padding-rigth" v-if="item.img" :value="item.img" :href="item.img">附件图片</a>
                     <a class="padding-rigth" v-if="item.attachment" :value="item.attachment" :href="item.attachment">附件文件</a>
                   </div>
                 </el-card>
@@ -159,12 +159,12 @@
       <el-tab-pane label="关联信息">
         <el-form v-if="supplier.supplierId===0">
           <el-form-item label="关联信息">
-            <span style="color: red">暂未关联院所，无关联信息</span>
+            <span style="color: red">暂未关联商家，无关联信息</span>
           </el-form-item>
         </el-form>
 
         <el-form v-if="supplier.supplierId!==0">
-          <el-form-item label="关联院所">
+          <el-form-item label="关联商家">
             <span>{{supplier.supplierName}}</span>
           </el-form-item>
           <el-form-item label="关联信息">

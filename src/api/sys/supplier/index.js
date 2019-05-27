@@ -27,6 +27,16 @@ export default {
     })
   },
 
+  updateInfo(data){
+    return request({
+      url:"/api/client/supplier/update-info",
+      method:"post",
+      data
+    })
+  },
+
+
+
   findById(id) {
     return request({
       url:"/api/client/supplier/"+id

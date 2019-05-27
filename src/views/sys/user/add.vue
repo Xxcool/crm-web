@@ -4,7 +4,7 @@
       <el-tab-pane label="基本信息" name="first">
         <el-form ref="dataForm" :rules="rules" :model="form" label-position="right" label-width="100px">
           <el-form-item label="用户名" prop="name">
-            <el-input v-model="form.name" :disabled="!!$route.query.id"/>
+            <el-input v-model="form.name" :disabled="!!$route.query.id" maxlength="25"/>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="form.email"/>
@@ -80,10 +80,10 @@
         roles: [],
         group: "",
         rules: {
-          name: [{required: true, message: '不能为空', trigger: 'change'}],
-          email: [{required: true, message: '不能为空', trigger: 'change'}],
+          name: [{required: true, message: '用户名不能为空', trigger: 'change'}],
+          email: [{required: true, message: '邮箱不能为空', trigger: 'change'}],
           roleId: [{required: true, message: '不能为空', trigger: 'change'}],
-          password: [{trigger: "change", min: 6, message: "密码最少6位"}],
+          password: [{trigger: "change", min: 6, max:20,message: "密码最少6位,最多20位"}],
           password_2: [{trigger: "change", validator: validatePassword_2}],
         }
       }
@@ -121,9 +121,17 @@
           if(valid){
             let data={...this.form};
             let roles=[];
+            if(this.form.roles.length<1){
+              this.$message.warning("用户所属部门不能为空");
+              return false;
+            }
+            if(data.orgCode==null ||data.orgCode==""){
+              this.$message.warning("用户所属部门不能为空");
+              return false;
+            }
             this.form.roles.forEach((item)=>{
               roles.push({id:item});
-            })
+            });
             data.roles=roles;
             api.save(data).then(() => {
               this.$message.success("保存成功")

@@ -13,10 +13,10 @@
                   <span >院所客户</span>
                 </el-form-item>
                 <el-form-item label="院所名称">
-                  <span >{{institutes.name}}</span>
+                    <span >{{institutes.name}}</span>
                 </el-form-item>
                 <el-form-item label="院所描述">
-                  <span >{{institutes.description}}</span>
+                  <span >{{institutes.remark}}</span>
                 </el-form-item>
                 <el-form-item label="院所类型">
                   <span v-if="institutes.type===1" >科研院所</span>
@@ -164,8 +164,9 @@
                   <div class="info-title"><span class="padding-rigth">{{item.created}}</span><span class="padding-rigth">录入人：{{item.entryPerson}}</span><span class="padding-rigth">跟踪行为：{{item.trackDoings}}</span><span class="padding-rigth">客户联系人：{{item.contactPerson}}</span></div>
                   <div class="info-title"><span class="padding-rigth">{{item.description}}</span></div>
                   <div class="info-title">
-                      <a class="padding-rigth" v-if="item.attachment" :value="item.img" :href="item.img">附件图片</a>
+                      <a class="padding-rigth" v-if="item.img" :value="item.img" :href="item.img">附件图片</a>
                       <a class="padding-rigth" v-if="item.attachment" :value="item.attachment" :href="item.attachment">附件文件</a>
+                      <a class="padding-rigth" v-if="item.contractAttachment" :value="item.contractAttachment" :href="item.contractAttachment">合同文件</a>
                   </div>
                 </el-card>
 
