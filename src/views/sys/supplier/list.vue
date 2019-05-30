@@ -276,7 +276,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="系统商家关联" width="40%" :visible.sync="dialogRelevanceFormVisible">
+    <el-dialog title="商家相关" width="40%" :visible.sync="dialogRelevanceFormVisible">
       <el-form ref="relevancesupplierForm" label-width="80px" :model="relevance" :rules="rules" :inline="true">
         <el-form-item label="商家名称">
           <el-input v-model="relevance.params.companyName" placeholder="输入商家名称搜索" style="max-width: 180px;width: 180px"></el-input>
