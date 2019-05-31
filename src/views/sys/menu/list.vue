@@ -30,8 +30,8 @@
         </el-form-item>
         <el-form-item label="类型" prop="type">
           <el-select v-model="temp.type" class="filter-item" placeholder="请选择类型">
-            <el-option label="菜单" value="0"/>
-            <el-option label="按钮" value="1"/>
+            <el-option label="菜单" :value="0"/>
+            <el-option label="按钮" :value="1"/>
           </el-select>
         </el-form-item>
         <el-form-item label="权限" prop="permission">

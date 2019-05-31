@@ -183,10 +183,6 @@
             })
             this.menuList()
           }).catch(() => {
-            this.$message({
-              type: 'error',
-              message: '删除失败!'
-            })
           })
         }).catch(() => {
         });
