@@ -83,8 +83,8 @@
           name: [{required: true, message: '用户名不能为空', trigger: 'change'}],
           email: [{required: true, message: '邮箱不能为空', trigger: 'change'}],
           roleId: [{required: true, message: '不能为空', trigger: 'change'}],
-          password: [{trigger: "change", min: 6, max:20,message: "密码最少6位,最多20位"}],
-          password_2: [{trigger: "change", validator: validatePassword_2}],
+          password: [{required: true, min: 6, max:20,message: "密码最少6位,最多20位",trigger: "change"}],
+          password_2: [{required: true,trigger: "change", validator: validatePassword_2}],
         }
       }
     },
