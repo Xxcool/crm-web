@@ -313,27 +313,13 @@
           </el-upload>
         </el-form-item>
         <el-form-item label="附件文件">
-          <el-upload
-            action="/api/common/upload/1"
-            accept="file/*"
-            class="avatar-uploader"
-            :show-file-list="false"
-            :on-success="handleUploadAttachmentSuccess"
-            with-credentials >
-            <img v-if="log.attachment" :src="log.attachment" class="avatar" title="点击重新上传">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          <el-upload class="upload-demo" ref="upload" action="/api/common/upload/1" :on-success="uploadAttachment" :multiple=false>
+            <el-button slot="trigger" size="small" type="primary" @click="clearUploadedImage">点击上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item label="上线合同" v-if="showContract">
-          <el-upload
-            action="/api/common/upload/1"
-            accept="file/*"
-            class="avatar-uploader"
-            :show-file-list="false"
-            :on-success="handleUploadContractSuccess"
-            with-credentials >
-            <img v-if="log.contractAttachment" :src="log.contractAttachment" class="avatar" title="点击重新上传">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        <el-form-item label="上线合同"  v-if="showContract">
+          <el-upload class="upload-demo" ref="upload" action="/api/common/upload/1" :on-success="uploadContractAttachment" :multiple=false>
+            <el-button slot="trigger" size="small" type="primary" @click="clearUploadedAttachment">点击上传</el-button>
           </el-upload>
         </el-form-item>
         <el-form-item label="联系人选择">
@@ -783,19 +769,9 @@
         }
       },
 
-      handleUploadContractSuccess(res, file) {
-        if (res.status === 1001) {
-          this.$message({
-            message: "登录过期，请重新登录",
-            type: "error",
-            duration: 5 * 1000
-          })
-          setTimeout(() => {
-            store.dispatch("logOut")
-          }, 5 * 1000)
-        } else if (res.status === 0) {
+      uploadContractAttachment(res, file) {
+        if (res.status === 0) {
           this.log.contractAttachment = res.data;
-          console.log(file)
         } else {
           this.$message({
             message: "上传文件失败",
@@ -804,20 +780,14 @@
           })
         }
       },
+      clearUploadedAttachment () {
+        this.$refs.upload.clearFiles();
+        this.log.contractAttachment = null;
+      },
 
-      handleUploadAttachmentSuccess(res, file) {
-        if (res.status === 1001) {
-          this.$message({
-            message: "登录过期，请重新登录",
-            type: "error",
-            duration: 5 * 1000
-          })
-          setTimeout(() => {
-            store.dispatch("logOut")
-          }, 5 * 1000)
-        } else if (res.status === 0) {
+      uploadAttachment(res) {
+        if (res.status === 0) {
           this.log.attachment = res.data;
-          console.log(file)
         } else {
           this.$message({
             message: "上传文件失败",
@@ -825,6 +795,10 @@
             duration: 5 * 1000
           })
         }
+      },
+      clearUploadedImage () {
+        this.$refs.upload.clearFiles();
+        this.log.attachment = null;
       },
     }
   }

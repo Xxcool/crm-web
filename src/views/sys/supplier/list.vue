@@ -252,16 +252,10 @@
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
-        <el-form-item label="附件文件">
-          <el-upload
-            action="/api/common/upload/1"
-            accept="file/*"
-            class="avatar-uploader"
-            :show-file-list="false"
-            :on-success="handleUploadAttachmentSuccess"
-            with-credentials >
-            <img v-if="log.attachment" :src="log.attachment" class="avatar" title="点击重新上传">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+
+        <el-form-item label="附件文件" prop="filePath">
+          <el-upload class="upload-demo" ref="upload" action="/api/common/upload/1" :on-success="uploadAttachment" :multiple=false>
+            <el-button slot="trigger" size="small" type="primary" @click="clearUploadedImage">点击上传</el-button>
           </el-upload>
         </el-form-item>
         <el-form-item label="联系人选择">
@@ -680,19 +674,10 @@
         }
       },
 
-      handleUploadAttachmentSuccess(res, file) {
-        if (res.status === 1001) {
-          this.$message({
-            message: "登录过期，请重新登录",
-            type: "error",
-            duration: 5 * 1000
-          })
-          setTimeout(() => {
-            store.dispatch("logOut")
-          }, 5 * 1000)
-        } else if (res.status === 0) {
+      uploadAttachment(res) {
+        if (res.status === 0) {
           this.log.attachment = res.data;
-          console.log(file)
+          console.log(this.log.attachment);
         } else {
           this.$message({
             message: "上传文件失败",
@@ -700,6 +685,10 @@
             duration: 5 * 1000
           })
         }
+      },
+      clearUploadedImage () {
+        this.$refs.upload.clearFiles();
+        this.log.attachment = null;
       },
 
       handleUploadSuccess(res) {
