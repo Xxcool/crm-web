@@ -704,6 +704,18 @@
         contact.selectAll(val.row.id).then(res=>{
           this.contactList=res.data;
         });
+        this.log = {
+          clientInstitutesId: null,
+          clientInstitutesName: null,
+          entryPerson: null,
+          trackDoings: null,
+          contactPerson: null,
+          img: null,
+          attachment: null,
+          contractAttachment: null,
+          remark: null,
+          description: null
+        };
         this.dialogLogFormVisible=true;
       },
 
