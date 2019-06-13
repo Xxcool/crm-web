@@ -372,9 +372,12 @@
     },
     methods: {
       loadContactData(){
-          this.loading=true;
+        this.loading=true;
+
         api.findById(this.$route.query.id).then(res => {
           this.supplier = res.data;
+          console.log(res.data);
+          console.log(this.supplier);
         }).catch(()=>{
         });
         this.clientSupplierId=this.$route.query.id;
@@ -529,18 +532,23 @@
         })
       },
       toOssContact(){
-        if(this.supplier.supplierId===0){
+        let supplierId = this.supplier.supplierId;
+        if(this.supplier.supplierId === null|| this.supplier.supplierId === 0){
           this.$message.warning("请先关联oss商家");
         }else{
           this.beforeContact();
           contact.ossMemberList(this.supplier.supplierId).then(res=>{
+            console.log(res.data)
             this.contactData.clientSupplierId=this.clientSupplierId;
             this.contactData.name=res.data.contactMan;
             this.contactData.mobile=res.data.mobile;
             this.contactData.appellation=res.data.contactMan;
+            this.contactData.email = res.data.email;
             contact.add(this.contactData).then(()=>{
               this.$message.success("同步成功");
               this.loadContactData();
+              console.log(supplierId);
+              this.supplier.supplierId = supplierId;
             }).catch(()=>{
             })
           }).catch(()=>{

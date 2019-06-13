@@ -557,6 +557,8 @@
           this.loadData();
         }).catch(()=>{
         })
+
+
       },
 
       saveRelevance(){
@@ -571,6 +573,7 @@
           this.loadData();
         }).catch(()=>{
         })
+
       },
       handleFreed(val){
         this.supplier=val.row;
