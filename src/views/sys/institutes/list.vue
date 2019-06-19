@@ -280,7 +280,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="客户行为跟踪" width="40%" :visible.sync="dialogLogFormVisible">
+    <el-dialog title="客户行为跟踪" width="40%" :visible.sync="dialogLogFormVisible" @close='closeDialog'>
       <el-form ref="logForm" label-width="80px" :model="log">
         <el-form-item label="跟踪行为">
           <el-select v-model="log.trackDoings" clearable>
@@ -313,12 +313,13 @@
           </el-upload>
         </el-form-item>
         <el-form-item label="附件文件">
-          <el-upload class="upload-demo" ref="upload" action="/api/common/upload/1" :on-success="uploadAttachment" :multiple=false>
+          <el-upload class="upload-demo" v-if="dialogLogFormVisible" ref="upload" action="/api/common/upload/1"
+                     :on-success="uploadAttachment" :multiple=false>
             <el-button slot="trigger" size="small" type="primary" @click="clearUploadedImage">点击上传</el-button>
           </el-upload>
         </el-form-item>
         <el-form-item label="上线合同"  v-if="showContract">
-          <el-upload class="upload-demo" ref="upload" action="/api/common/upload/1" :on-success="uploadContractAttachment" :multiple=false>
+          <el-upload class="upload-demo" v-if="dialogLogFormVisible" ref="upload" action="/api/common/upload/1" :on-success="uploadContractAttachment" :multiple=false>
             <el-button slot="trigger" size="small" type="primary" @click="clearUploadedAttachment">点击上传</el-button>
           </el-upload>
         </el-form-item>
@@ -512,6 +513,7 @@
         props:{
           label:"name"
         },
+        imgList:[],
       };
     },
     created() {
@@ -619,7 +621,7 @@
         this.dialogAllotFormVisible=true;
       },
       handleUpdateStatusByIds(){
-        if(this.multipleSelection.length==0){
+        if(this.multipleSelection.length===0){
           this.dialogAllotsFormVisible=false;
           this.$message.warning("请选择要分配的院所")
         }else {
@@ -736,7 +738,18 @@
         api.updateByOnLine(this.institutes).then(()=>{
           logApi.add(this.log).then(()=>{
             this.$message.success("添加成功");
-            this.log={};
+            this.log={
+              clientInstitutesId:null,
+              clientInstitutesName:null,
+              entryPerson:null,
+              trackDoings:null,
+              contactPerson:null,
+              img:null,
+              attachment:null,
+              contractAttachment:null,
+              remark:null,
+              description:null
+            };
             this.dialogLogFormVisible=false;
             this.loadData();
           })
@@ -812,6 +825,10 @@
         this.$refs.upload.clearFiles();
         this.log.attachment = null;
       },
+      closeDialog(){
+        this.$refs.logForm.resetFields();
+        this.dialogLogFormVisible=false;
+      }
     }
   }
 </script>
