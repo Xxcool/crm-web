@@ -7,7 +7,7 @@
             <el-input v-model="form.name" :disabled="!!$route.query.id" maxlength="25"/>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
-            <el-input v-model="form.email"/>
+            <el-input v-model="form.email" maxlength="60"/>
           </el-form-item>
           <el-form-item label="密码" prop="password">
             <el-input type="password" v-model="form.password"/>
