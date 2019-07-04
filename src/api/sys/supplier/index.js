@@ -87,6 +87,33 @@ export default {
     })
   },
 
+  contractList(data){
+    return request({
+      url:"/api/supplier/contract-list",
+      method:"post",
+      data
+    })
+  },
+  contractType(){
+    return request({
+      url:"/api/supplier/contract-type",
+      method:"get"
+    })
+  },
+
+  supplierById(id){
+    return request({
+      url:"/api/supplier/"+id,
+      method:"get",
+    })
+  },
+  shopSupplierId(id){
+    return request({
+      url:"/api/supplier/shop/"+id,
+      method:"get",
+    })
+  },
+
   relevance(data){
     return request({
       url:"/api/client/supplier/relevance",

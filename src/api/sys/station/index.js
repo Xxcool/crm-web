@@ -4,27 +4,27 @@ import request from "../../../utils/request";
 export default {
   findById(id) {
     return request({
-      url: "/api/sys/station/" + id,
+      url: "/api/basic/station/" + id,
       method: "get",
     })
   },
   save(data) {
     return request({
-      url: data.id ? "/sys/station/update" : "/sys/station/add",
+      url: data.id ? "/sys/basic/update" : "/sys/basic/add",
       method: "post",
       data: data
     })
   },
   list(data) {
     return request({
-      url: "/api/sys/station/list",
+      url: "/api/basic/station/list",
       method: "post",
       data: data
     })
   },
   del(id) {
     return request({
-      url: "/api/sys/station/del/" + id,
+      url: "/api/basic/station/del/" + id,
       method: "get",
     })
   },

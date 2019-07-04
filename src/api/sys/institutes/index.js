@@ -32,6 +32,11 @@ export default {
       url:"/api/client/institutes/"+id
     })
   },
+  institutesById(id) {
+    return request({
+      url:"/api/basic/institutes/"+id
+    })
+  },
 
   /**
    * 分配院所
