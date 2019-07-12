@@ -299,6 +299,8 @@
                     </template>
                   </el-table-column>
                 </el-table>
+                <pagination v-show="total > filter.count" :total="total" :page.sync="filter.page"
+                            :pageSize.sync="filter.count" @pagination="supplierContactData"/>
               </el-tab-pane>
             </el-tabs>
           </el-form-item>
@@ -311,7 +313,7 @@
           <el-row>
             <el-col :span="10">
               <el-form-item label="合同类型">
-                <span v-for="c in contractType">
+                <span v-for="c in contractType"  >
                   <span v-if="c.value == contract.contractType">
                     {{c.label}}
                   </span>
@@ -587,6 +589,7 @@
             signerId: null,
           }
         },
+        total:0,
         contractType: [],
         supplierContactVisible:false,
         contract:{}

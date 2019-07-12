@@ -394,7 +394,29 @@
                   </el-row>
                 </el-form>
               </el-tab-pane>
-              <el-tab-pane label="评级信息">角色管理</el-tab-pane>
+              <el-tab-pane label="评级信息">
+                <el-table
+                  :data="tableData"
+                  border
+                  stripe
+                  v-loading="loading"
+                  element-loading-text="拼命加载中...">
+                  <el-table-column prop="nickName" label="用户名"></el-table-column>
+                  <el-table-column prop="taskName" label="课题组"></el-table-column>
+                  <el-table-column prop="mobile" label="手机号"></el-table-column>
+                  <el-table-column prop="gradeName" label="等级名称"></el-table-column>
+                  <el-table-column prop="percent" label="优惠百分比"></el-table-column>
+                  <el-table-column prop="coefficient" label="成长系数"></el-table-column>
+                  <el-table-column prop="totalGrowth" label="会员成长总值"></el-table-column>
+                  <el-table-column label="操作" width="140" fixed="right">
+                    <template slot-scope="scope">
+                      <el-button type="primary" @click="contractDetail(scope)">查看</el-button>
+                    </template>
+                  </el-table-column>
+                </el-table>
+                <pagination v-show="account.total > account.count" :total="account.total" :page.sync="account.page"
+                            :pageSize.sync="account.count" @pagination="accountNumberList"/>
+              </el-tab-pane>
             </el-tabs>
           </el-form-item>
 
@@ -524,6 +546,7 @@
     name: "institutes_detail",
     data() {
       return {
+        tableData:[],
         loading: true,
         clientInstitutesId: null,
         institutes: {
@@ -554,6 +577,16 @@
             clientInstitutesId: 0,
             sex: null,
             name: null
+          }
+        },
+        account:{
+          total:0,
+          count: 10, // 页大小
+          page: 1, // 当前页
+          sort: '',
+          order: '',
+          params: {
+
           }
         },
         log: {
@@ -601,7 +634,9 @@
         stationLoading: true,
         dialogContactFormVisible: false,
         dialogLogFormVisible: false,
-        ins: {},
+        ins: {
+          id:null,
+        },
         station:{},
       }
     },
@@ -609,18 +644,15 @@
       if (this.$route.query.id) {
         this.loadContactData();
       }
-
     },
     methods: {
       loadContactData() {
         this.loading = true;
         api.findById(this.$route.query.id).then(res => {
-          this.institutes = res.data;
-          this.typeList = api.typeList();
           if (res.data.institutesId) {
-            api.institutesById(res.data.institutesId).then(res => {
-              this.ins = res.data;
-              if(res.data.settleSupplierTarget && res.data.settleSupplierTarget !=''){
+            api.institutesById(res.data.institutesId).then(ins => {
+              this.ins = ins.data;
+              if(ins.data.settleSupplierTarget && ins.data.settleSupplierTarget !=''){
                 let split = this.ins.settleSupplierTarget.split(',');
                 let str ="";
                 split.forEach(station => {
@@ -634,17 +666,19 @@
                     str += "一般纳税人（非代结算) "
                   }
                 });
-
                 this.ins.settleSupplierTarget = str;
               }
-              if(res.data.defaultStation >= 0){
-                station.findById(res.data.defaultStation).then(res => {
-                  this.station = res.data;
+              if(ins.data.defaultStation >= 0){
+                station.findById(ins.data.defaultStation).then(sta => {
+                  this.station = sta.data;
                 }).catch()
               }
             }).catch();
-
           }
+          this.institutes = res.data;
+          this.typeList = api.typeList();
+          this.account.params.institutesId = res.data.institutesId;
+          this.accountNumberList();
         }).catch(() => {
         });
         this.clientInstitutesId = this.$route.query.id;
@@ -835,7 +869,14 @@
           return value.id
         })
       },
-
+      accountNumberList(){
+        console.log(this.account.params)
+        api.selectGradeByIns(this.account).then(res => {
+          this.tableData = res.data.results;
+          this.account.total = res.data.count;
+          this.loading = false;
+        }).catch()
+      },
       handleUploadImgSuccess(res, file) {
         if (res.status === 1001) {
           this.$message({

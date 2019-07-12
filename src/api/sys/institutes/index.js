@@ -37,6 +37,13 @@ export default {
       url:"/api/basic/institutes/"+id
     })
   },
+  selectGradeByIns(data) {
+    return request({
+      url:"/api/member/member/select-grade-by-institutes/",
+      method:"post",
+      data
+    })
+  },
 
   /**
    * 分配院所
