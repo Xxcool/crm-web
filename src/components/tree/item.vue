@@ -1,9 +1,11 @@
 <template>
   <li class="tree-item">
     <div class="item-wrapper">
-      <span v-if="isFolder" class="item-toggle" @click="toggle"><i :class="[toggleIcon]" class="tree-icon-arrow"></i></span>
+      <span v-if="isFolder" class="item-toggle" @click="toggle"><i :class="[toggleIcon]"
+                                                                   class="tree-icon-arrow"></i></span>
       <span v-else class="item-toggle"></span>
-      <span v-if="options.checkbox" :class="[labelIcon, labelStatus]" class="item-checkbox" @click="toggleChecked"></span>
+      <span v-if="options.checkbox" :class="[labelIcon, labelStatus]" class="item-checkbox"
+            @click="toggleChecked"></span>
       <span :class="isBold" class="item-label" @click="handle">{{ model[options.label] }}</span>
     </div>
     <ul v-if="isFolder" v-show="open" class="tree-list">
@@ -134,16 +136,8 @@
       if (this.options.checkbox) {
         if (this.idsWithParent.indexOf(this.model.id) !== -1) {
           this.itemState = this.itemState + 1
-          if (this.isFolder && !this.options.idsWithParent) {
-            let index = this.ids.indexOf(this.model.id)
-            if (index !== -1) {
-              this.$delete(this.ids, index)
-            }
-          }
-          this.$emit('child-change', true)
         }
         if (this.state > 0) {
-          this.addChecked()
           this.itemState = this.itemState + 1
         }
       }

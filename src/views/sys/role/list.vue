@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="tools">
-      <el-button type="primary" :v-has="'sys'" @click="handleCreate">添加</el-button>
+      <el-button type="primary" v-has="'sys:role:list:_add'" @click="handleCreate">添加</el-button>
     </div>
     <el-table
       :data="tableData"
@@ -23,20 +23,20 @@
       </el-table-column>
       <el-table-column
         label="操作"
-        width="200">
+        width="240">
         <template slot-scope="scope">
-          <el-button type="text" @click="handleEditMenu(scope)">配置权限</el-button>
-          <el-button type="text" @click="handleUpdate(scope)">编辑</el-button>
-          <el-button type="text" @click="handleDel(scope)">删除</el-button>
+          <el-button type="success" v-has="'sys:role:list:_config'" @click="handleEditMenu(scope)">配置权限</el-button>
+          <el-button type="primary" v-has="'sys:role:list:_edit'" @click="handleUpdate(scope)">编辑</el-button>
+          <el-button type="danger" v-has="'sys:role:list:_del'" @click="handleDel(scope)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total > filter.count" :total="total" :page.sync="filter.page"
+    <pagination :total="total" :page.sync="filter.page"
                 :pageSize.sync="filter.count" @pagination="loadData"/>
-    <el-dialog :title="dialogTitle[dialogType]" :visible.sync="dialogFormVisible" width="30%">
+    <el-dialog :title="dialogTitle[dialogType]" :visible.sync="dialogFormVisible" width="400px">
       <el-form ref="detailForm" :rules="rules" :model="temp" label-position="left" label-width="80px">
         <el-form-item label="角色名称" prop="name">
-          <el-input v-model="temp.name" maxlength="25"/>
+          <el-input v-model="temp.name"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -45,29 +45,25 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-dialog title="配置菜单" :visible.sync="dialogMenuVisible">
-      <el-tree
-        ref="menuTree"
-        :data="menuList"
-        show-checkbox
-        node-key="id"
-        :default-checked-keys="checkedIds"
-        :props="props">
-      </el-tree>
+    <el-dialog title="配置菜单" :visible.sync="dialogMenuVisible" width="400px">
+      <div style="max-height: 400px;overflow-y: auto">
+        <tree v-model="checkedIds" :tree-data="menuList" :options="options"></tree>
+      </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogMenuVisible = false">取 消</el-button>
         <el-button type="primary" @click="saveRoleMenu(roleId)">确 定</el-button>
       </div>
     </el-dialog>
   </div>
-  <!--分页end-->
 </template>
 
 <script>
   import api from "../../../api/sys/role"
+  import tree from '../../../components/tree/index.vue'
 
   export default {
     name: "list",
+    components: {tree},
     data() {
       return {
         tableData: [],
@@ -99,6 +95,10 @@
         },
         menuList: [],
         checkedIds: [],
+        options: {
+          label: 'name',
+          depthOpen: 1
+        },
         roleId: null,
         props: {
           label: 'name'
@@ -127,7 +127,6 @@
         })
       },
       handleDel(val) {
-        console.log(val)
         this.$confirm('是否删除来源【' + val.row.name + '】?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -162,6 +161,8 @@
         this.temp.name = val.row.name
       },
       handleEditMenu(val) {
+        this.menuList = [];
+        this.checkedIds = []
         api.getRoleMenuTree(val.row.id).then(res => {
           this.menuList = res.data
           this.roleId = val.row.id
@@ -171,15 +172,14 @@
             let menu = res.data[i];
             if (menu.checked) {
               menuIds.push(menu.id);
+              menuIds = menuIds.concat(this.getCheckedMenuIds(menu))
             }
-            menuIds = menuIds.concat(this.getCheckedMenuIds(menu))
           }
           this.checkedIds = menuIds
         }).catch(() => {
         })
       },
       tableSortChange(val) {
-        console.log(val)
         if (val.prop != null) {
           if (val.order === 'descending') {
             this.filter.order = 'desc'
@@ -209,26 +209,26 @@
             return false;
           }
         });
-
       },
       saveRoleMenu(id) {
-        this.dialogMenuVisible = false
-        console.log(this.$refs.menuTree.getCheckedKeys())
-        api.updateRoleMenu(id, this.$refs.menuTree.getCheckedKeys()).then(() => {
+        api.updateRoleMenu(id, this.checkedIds).then(() => {
           this.$message.success("保存成功")
           this.loadData();
+          this.dialogMenuVisible = false
         }).catch(() => {
         })
       },
       getCheckedMenuIds(menu) {
         let menuIds = [];
-        if (menu.children && menu.children.length > 0) {
-          for (let i = 0; i < menu.children.length; i++) {
+        if (menu.checked) {
+          if (menu.children && menu.children.length > 0) {
+            for (let i = 0; i < menu.children.length; i++) {
               let sub = menu.children[i];
               if (sub.checked) {
                 menuIds.push(sub.id);
+                menuIds = menuIds.concat(this.getCheckedMenuIds(sub))
               }
-            menuIds = menuIds.concat(this.getCheckedMenuIds(sub))
+            }
           }
         }
         return menuIds
@@ -236,7 +236,3 @@
     }
   }
 </script>
-
-<style scoped>
-
-</style>
