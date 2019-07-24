@@ -173,9 +173,9 @@
                     class="padding-rigth">客户联系人：{{item.contactPerson}}</span></div>
                   <div class="info-title"><span class="padding-rigth">{{item.description}}</span></div>
                   <div class="info-title">
-                    <a class="padding-rigth" v-if="item.img" :value="item.img" :href="item.img">附件图片</a>
-                    <a class="padding-rigth" v-if="item.attachment" :value="item.attachment" :href="item.attachment">附件文件</a>
-                    <a class="padding-rigth" v-if="item.contractAttachment" :value="item.contractAttachment"
+                    <a class="padding-rigth" target="_blank" v-if="item.img" :value="item.img" :href="item.img">附件图片</a>
+                    <a class="padding-rigth" target="_blank" v-if="item.attachment" :value="item.attachment" :href="item.attachment">附件文件</a>
+                    <a class="padding-rigth" target="_blank" v-if="item.contractAttachment" :value="item.contractAttachment"
                        :href="item.contractAttachment">合同文件</a>
                   </div>
                 </el-card>
