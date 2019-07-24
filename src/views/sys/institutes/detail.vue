@@ -43,7 +43,7 @@
                   <el-input v-model="institutes.name"></el-input>
                 </el-form-item>
                 <el-form-item label="院所描述">
-                  <el-input type="textarea" v-model="institutes.description" style="width: 80%"></el-input>
+                  <el-input type="textarea" v-model="institutes.remark" style="width: 80%"></el-input>
                 </el-form-item>
                 <el-form-item label="院所类型">
                   <el-select v-model="institutes.type">
