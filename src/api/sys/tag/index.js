@@ -49,6 +49,11 @@ export default {
       url:"/api/tag/org-tag-tree/"+code
     })
   },
+  getOrgTagTreeByInstitutesId(id){
+    return request({
+      url:"/api/tag/org-tag-tree/institutes/"+id
+    })
+  },
 
   findOrgTag(code){
     return request({

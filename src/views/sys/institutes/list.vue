@@ -234,6 +234,7 @@
           :data="orgList"
           show-checkbox
           node-key="code"
+          :default-checked-keys="institutes.tagCodes"
           :props="props">
         </el-tree>
       </el-form-item>
@@ -281,8 +282,8 @@
     </el-dialog>
 
     <el-dialog title="客户行为跟踪" width="40%" :visible.sync="dialogLogFormVisible" @close='closeDialog'>
-      <el-form ref="logForm" label-width="80px" :model="log">
-        <el-form-item label="跟踪行为">
+      <el-form ref="logForm" label-width="80px" :model="log" :rules="logFormRules">
+        <el-form-item label="跟踪行为" prop="trackDoings">
           <el-select v-model="log.trackDoings" clearable>
             <el-option v-for="item in allTagList" :key="item.name" :value="item.name" :label="item.name"></el-option>
           </el-select>
@@ -493,6 +494,9 @@
           remark:null,
           description:null
         },
+        logFormRules: {
+          trackDoings: [{required: true, message: '不能为空', trigger: 'change'}],
+        },
         stationList: [],
         dialogCreateFormVisible:false,
         dialogAllotFormVisible:false,
@@ -618,6 +622,7 @@
       } ,
       handleUpdateStatus(val){
         this.institutes.id=val.row.id;
+        this.institutes.tagCodes = val.row.orgCodes
         this.dialogAllotFormVisible=true;
       },
       handleUpdateStatusByIds(){
@@ -697,10 +702,9 @@
           this.tagList=res.data;
         })
       },
-
       handleCreateLog(val){
         this.institutes=val.row;
-        tag.allList().then(res=>{
+        tag.getOrgTagTreeByInstitutesId(val.row.id).then(res=>{
           this.allTagList=res.data;
         });
         contact.selectAll(val.row.id).then(res=>{
@@ -731,30 +735,34 @@
       },
 
       commitLogData(){
-        this.institutes.onLine=this.onLine;
-        this.institutes.description=this.log.description;
-        this.log.clientInstitutesId=this.institutes.id;
-        this.log.clientInstitutesName=this.institutes.name;
-        api.updateByOnLine(this.institutes).then(()=>{
-          logApi.add(this.log).then(()=>{
-            this.$message.success("添加成功");
-            this.log={
-              clientInstitutesId:null,
-              clientInstitutesName:null,
-              entryPerson:null,
-              trackDoings:null,
-              contactPerson:null,
-              img:null,
-              attachment:null,
-              contractAttachment:null,
-              remark:null,
-              description:null
-            };
-            this.dialogLogFormVisible=false;
-            this.loadData();
-          })
-        }).catch(()=>{
+        this.$refs.logForm.validate(valid => {
+          if (valid) {
+            this.institutes.onLine=this.onLine;
+            this.institutes.description=this.log.description;
+            this.log.clientInstitutesId=this.institutes.id;
+            this.log.clientInstitutesName=this.institutes.name;
+            api.updateByOnLine(this.institutes).then(()=>{
+              logApi.add(this.log).then(()=>{
+                this.$message.success("添加成功");
+                this.log={
+                  clientInstitutesId:null,
+                  clientInstitutesName:null,
+                  entryPerson:null,
+                  trackDoings:null,
+                  contactPerson:null,
+                  img:null,
+                  attachment:null,
+                  contractAttachment:null,
+                  remark:null,
+                  description:null
+                };
+                this.dialogLogFormVisible=false;
+                this.loadData();
+              })
+            }).catch(()=>{
 
+            })
+          }
         })
       },
 
