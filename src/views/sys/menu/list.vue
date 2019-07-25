@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="tools">
-      <el-button type="primary" v-has="'sys'" @click="handleCreate">添加</el-button>
+      <el-button type="primary" v-has="'sys:menu:list:_add'" @click="handleCreate">添加</el-button>
     </div>
     <div class="container">
       <el-table :data="data" border row-key="id" :loading="loading">
@@ -9,9 +9,9 @@
         </el-table-column>
         <el-table-column label="操作" width="210">
           <template slot-scope="scope">
-            <el-button type="success" v-if="scope.row.type===0" @click="handleCreate(scope.row)">添加</el-button>
-            <el-button type="primary" @click="handleUpdate(scope.row)">编辑</el-button>
-            <el-button type="danger" @click="handleDel(scope.row)">删除</el-button>
+            <el-button type="success" v-if="scope.row.type===0" v-has="'sys:menu:list:_addChild'" @click="handleCreate(scope.row)">添加</el-button>
+            <el-button type="primary" v-has="'sys:menu:list:_edit'" @click="handleUpdate(scope.row)">编辑</el-button>
+            <el-button type="danger" v-has="'sys:menu:list:_del'" @click="handleDel(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

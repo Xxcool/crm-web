@@ -54,7 +54,7 @@
         <div class="upload-btn-inline">
           <el-button  @click="downloadTemplate()">下载客户导入模板</el-button>
         </div>
-        <el-upload
+        <el-upload v-has="'sys:supplier:list:_batch_import'"
           class="upload-btn-inline"
           action="/api/client/supplier/importSupplier"
           multiple
@@ -63,8 +63,8 @@
           :on-success="handleUploadSuccess">
           <el-button  type="primary">批量导入</el-button>
         </el-upload>
-        <el-button @click="exportSupplier"  type="primary">导出客户信息</el-button>
-        <el-button @click="handleCreate()"  type="primary">新增商家</el-button>
+        <el-button v-has="'sys:supplier:list:_export'" @click="exportSupplier"  type="primary">导出客户信息</el-button>
+        <el-button v-has="'sys:supplier:list:_add'" @click="handleCreate()"  type="primary">新增商家</el-button>
       </el-form>
     </div>
     <el-table
@@ -169,10 +169,10 @@
         width="300"
         fixed="right">
         <template slot-scope="scope">
-          <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handleUpdateStatus(scope)">分配</el-button>
-          <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handleCreateLog(scope)">跟踪</el-button>
-          <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handleRelevance(scope)">关联</el-button>
-          <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handleFreed(scope)">释放</el-button>
+          <el-button v-has="'sys:supplier:list:_allot'" type="primary" @click="handleUpdateStatus(scope)">分配</el-button>
+          <el-button v-has="'sys:supplier:list:_track'" type="primary" @click="handleCreateLog(scope)">跟踪</el-button>
+          <el-button v-has="'sys:supplier:list:_relevance'" type="primary" @click="handleRelevance(scope)">关联</el-button>
+          <el-button v-has="'sys:supplier:list:_release'" type="primary" @click="handleFreed(scope)">释放</el-button>
         </template>
       </el-table-column>
     </el-table>

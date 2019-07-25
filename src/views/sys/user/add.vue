@@ -38,8 +38,8 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSubmit">{{$route.query.id?"保存":"创建"}}</el-button>
-            <el-button @click="handleCancel">取消</el-button>
+            <el-button type="primary" v-has="'sys:user:add:_save'" @click="onSubmit">{{$route.query.id?"保存":"创建"}}</el-button>
+            <el-button v-has="'sys:user:add:_cancel'" @click="handleCancel">取消</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>

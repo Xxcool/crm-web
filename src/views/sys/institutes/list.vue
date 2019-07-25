@@ -62,9 +62,9 @@
           <el-button type="primary" @click="loadData">搜索</el-button>
         </el-form-item>
         <br>
-        <el-button @click="handleUpdateStatusByIds()"  type="primary">批量分配</el-button>
-        <el-button @click="exportInstitutes"  type="primary">导出客户信息</el-button>
-        <el-button @click="handleCreate()"  type="primary">新增院所</el-button>
+        <el-button v-has="'sys:institutes:list:_batch_allot'" @click="handleUpdateStatusByIds()"  type="primary">批量分配</el-button>
+        <el-button v-has="'sys:institutes:list:_export'" @click="exportInstitutes"  type="primary">导出客户信息</el-button>
+        <el-button v-has="'sys:institutes:list:_add'" @click="handleCreate()"  type="primary">新增院所</el-button>
       </el-form>
     </div>
     <el-table
@@ -183,10 +183,10 @@
         width="300"
         fixed="right">
         <template slot-scope="scope">
-          <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handleUpdateStatus(scope)">分配</el-button>
-          <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handleCreateLog(scope)">跟踪</el-button>
-          <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handleRelevance(scope)">关联</el-button>
-          <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handleFreed(scope)">释放</el-button>
+          <el-button v-has="'sys:institutes:list:_allot'" type="primary" @click="handleUpdateStatus(scope)">分配</el-button>
+          <el-button v-has="'sys:institutes:list:_track'" type="primary" @click="handleCreateLog(scope)">跟踪</el-button>
+          <el-button v-has="'sys:institutes:list:_relevance'" type="primary" @click="handleRelevance(scope)">关联</el-button>
+          <el-button v-has="'sys:institutes:list:_release'" type="primary" @click="handleFreed(scope)">释放</el-button>
         </template>
       </el-table-column>
     </el-table>
