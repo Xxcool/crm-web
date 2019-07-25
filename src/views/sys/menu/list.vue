@@ -9,7 +9,7 @@
         </el-table-column>
         <el-table-column label="操作" width="210">
           <template slot-scope="scope">
-            <el-button type="success" @click="handleCreate(scope.row)">添加</el-button>
+            <el-button type="success" v-if="scope.row.type===0" @click="handleCreate(scope.row)">添加</el-button>
             <el-button type="primary" @click="handleUpdate(scope.row)">编辑</el-button>
             <el-button type="danger" @click="handleDel(scope.row)">删除</el-button>
           </template>
