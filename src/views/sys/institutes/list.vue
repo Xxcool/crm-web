@@ -481,7 +481,7 @@
           orgCodes:[],
           userIds:[]
         },
-        onLine:1,
+        onLine:0,
         log:{
           clientInstitutesId:null,
           clientInstitutesName:null,
@@ -513,7 +513,7 @@
         allTagList:[],
         contactList:[],
         orgCode:null,
-        showContract:true,
+        showContract:false,
         props:{
           label:"name"
         },
