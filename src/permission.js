@@ -13,17 +13,6 @@ NProgress.configure({showSpinner: false})
 // 登录注册
 const whiteList = ["/login", "/404", "/401","/redirect"]
 
-function hasPermission(to) {
-  const path = to.path
-  return new Promise((resolve, reject) => {
-    if (store.getters.purview.some(role => path === role) || whiteList.some(role => path === role) || to.name === "redirect"||1===1) {
-      resolve()
-    } else {
-      reject()
-    }
-  })
-}
-
 router.beforeEach((to, from, next) => {
   NProgress.start()
   if (cookie_getToken()) {
@@ -32,18 +21,10 @@ router.beforeEach((to, from, next) => {
       NProgress.done()
     } else {
       if (store.getters.userInfo.name) {
-        hasPermission(to).then(() => {
-          next()
-        }).catch(() => {
-          next({path: "/401"})
-        })
+        next()
       } else {
         store.dispatch("set_userInfo").then(() => {
-          hasPermission(to).then(() => {
-            next()
-          }).catch(() => {
-            next({path: "/401"})
-          })
+          next()
         }).catch(() => {
           store.dispatch("logOut")
           next({path: "/"})

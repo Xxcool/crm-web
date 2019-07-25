@@ -33,6 +33,9 @@ const app = {
     },
     SET_ACTIVENAV: (state, activeNav) => {
       state.activeNav = activeNav
+    },
+    SET_PERMISSIONS: (state, permissions) => {
+      state.permissions = permissions
     }
   },
   actions: {
@@ -92,6 +95,8 @@ const app = {
         api_app.menu().then(response => {
           let menu = arrSort(response.data.menuTrees, "children")
           commit("SET_MENU", menu)
+          debugger
+          commit("SET_PERMISSIONS", response.data.permissions)
           if (menu.length > 0) {
             commit("SET_ACTIVENAV", menu[0].permission)
           }
