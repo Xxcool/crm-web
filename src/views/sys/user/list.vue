@@ -21,8 +21,7 @@
     </div>
     <el-table
       :data="tableData"
-      border
-      stripe
+      border stripe
       v-loading="loading"
       element-loading-text="拼命加载中...">
       <el-table-column

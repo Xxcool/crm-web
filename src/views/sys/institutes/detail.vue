@@ -91,6 +91,11 @@
       <el-tab-pane label="联系人">
         <div class="tools">
           <el-form :inline=true v-model="contacts.params">
+            <el-button @click="toOssContact" type="primary">同步oss系统联系人</el-button>
+            <el-button @click="exportContact" type="primary">导出联系人信息</el-button>
+            <el-button @click="handleCreate()" type="primary">新增联系人</el-button>
+            <el-button @click="goBack(true)">返回</el-button>
+            <div style="margin-top:10px;">
             <el-form-item label="性别">
               <el-select v-model="contacts.params.sex" clearable placeholder="请选择">
                 <el-option label="男" :value="0"></el-option>
@@ -102,12 +107,7 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="loadContactData">搜索</el-button>
-            </el-form-item>
-            <br>
-            <el-button @click="toOssContact" type="primary">同步oss系统联系人</el-button>
-            <el-button @click="exportContact" type="primary">导出联系人信息</el-button>
-            <el-button @click="handleCreate()" type="primary">新增联系人</el-button>
-            <el-button @click="goBack(true)">返回</el-button>
+            </el-form-item></div>
           </el-form>
         </div>
         <el-table
@@ -126,15 +126,25 @@
               <span v-else-if="scope.row.sex===1">女</span>
             </template>
           </el-table-column>
-          <el-table-column prop="mobile" label="手机"></el-table-column>
-          <el-table-column prop="email" label="邮箱"></el-table-column>
+          <el-table-column prop="mobile" label="手机">
+            <template slot-scope="scope">
+              <span v-if="(scope.row.showStatus==0)&&(checkList.indexOf(scope.row.addUserId)==-1)">***********</span>
+              <span v-else>{{scope.row.mobile}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="email" label="邮箱">
+            <template slot-scope="scope">
+              <span v-if="(scope.row.showStatus==0)&&(checkList.indexOf(scope.row.addUserId)==-1)">***********</span>
+              <span v-else>{{scope.row.email}}</span>
+            </template>
+          </el-table-column>
           <el-table-column label="操作" width="300">
             <template slot-scope="scope">
               <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handelContactView(scope)">查看
               </el-button>
-              <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handelContactUpdate(scope)">编辑
+              <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handelContactUpdate(scope)" :disabled="checkList.indexOf(scope.row.addUserId)">编辑
               </el-button>
-              <el-button v-has="'supplier:supplier:edit'" type="danger" @click="handleContactDel(scope.row)">删除
+              <el-button v-has="'supplier:supplier:edit'" type="danger" @click="handleContactDel(scope.row)" :disabled="checkList.indexOf(scope.row.addUserId)">删除
               </el-button>
             </template>
           </el-table-column>
@@ -175,8 +185,7 @@
                   <div class="info-title">
                     <a class="padding-rigth" target="_blank" v-if="item.img" :value="item.img" :href="item.img">附件图片</a>
                     <a class="padding-rigth" target="_blank" v-if="item.attachment" :value="item.attachment" :href="item.attachment">附件文件</a>
-                    <a class="padding-rigth" target="_blank" v-if="item.contractAttachment" :value="item.contractAttachment"
-                       :href="item.contractAttachment">合同文件</a>
+                    <a class="padding-rigth" target="_blank" v-if="item.contractAttachment" :value="item.contractAttachment" :href="item.contractAttachment">合同文件</a>
                   </div>
                 </el-card>
 
@@ -458,6 +467,12 @@
                           type="date" style="width: 60%">
           </el-date-picker>
         </el-form-item>
+        <el-form-item label="是否公开">
+          <template>
+            <el-radio v-model="contactData.showStatus" :label="1">是</el-radio>
+            <el-radio v-model="contactData.showStatus" :label="0">否</el-radio>
+          </template>
+        </el-form-item>
         <el-form-item label="备注">
           <el-input type="textarea" v-model="contactData.remark"></el-input>
         </el-form-item>
@@ -541,6 +556,7 @@
   import tag from "../../../api/sys/tag"
   import store from '../../../store/index'
   import logApi from "../../../api/sys/log"
+  import {mapGetters} from "vuex"
 
   export default {
     name: "institutes_detail",
@@ -565,6 +581,7 @@
         props: {
           label: "name"
         },
+        checkList: [], //当前用户有权限操作的用户ID列表
         concatTableData: [],
         multipleSelection: [],
         stationList: [],
@@ -604,6 +621,7 @@
         allTagList: [],
         contactData: {
           id: null,
+          addUserId: null,
           clientInstitutesId: null,
           name: null,
           sex: null,
@@ -614,7 +632,8 @@
           weChat: null,
           phoneNumber: null,
           remark: null,
-          email: null
+          email: null,
+          showStatus: null
         },
         contactDatas: [],
         rules: {
@@ -644,6 +663,11 @@
       if (this.$route.query.id) {
         this.loadContactData();
       }
+    },
+    computed: {
+      ...mapGetters([
+        "userInfo"
+      ]),
     },
     methods: {
       loadContactData() {
@@ -693,6 +717,7 @@
         this.handleTag();
         this.selectContactAll();
         this.selectLogByInstitutes();
+        this.userCheckList();
       },
       handleCreate() {
         this.beforeContact();
@@ -727,6 +752,10 @@
       handelContactView(scope) {
         this.beforeContact();
         this.contactData = scope.row;
+        if((this.contactData.showStatus==0)&&(this.checkList.indexOf(scope.row.addUserId)==-1)){
+          this.contactData.email = '***********'
+          this.contactData.mobile = '***********'
+        }
         this.titleType = 'view';
         this.showContact = false;
         this.contactDisabled = true;
@@ -754,7 +783,8 @@
           weChat: null,
           phoneNumber: null,
           remark: null,
-          email: null
+          email: null,
+          showStatus: null
         };
       },
       handleInstitutesStatus() {
@@ -870,13 +900,18 @@
         })
       },
       accountNumberList(){
-        console.log(this.account.params)
         api.selectGradeByIns(this.account).then(res => {
           this.tableData = res.data.results;
           this.account.total = res.data.count;
           this.loading = false;
         }).catch()
       },
+      userCheckList(){
+        api.checkList(this.userInfo.id).then(res => {
+          this.checkList = res.data
+        }).catch()
+      },
+      
       handleUploadImgSuccess(res, file) {
         if (res.status === 1001) {
           this.$message({

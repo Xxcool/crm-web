@@ -36,6 +36,12 @@
                             children: 'children',
                           }"
             />
+            <el-radio-group v-model="form.checkType"
+              style="margin-left:30px;">
+              <el-radio border :label="1">查看整个部门</el-radio>
+              <el-radio border :label="2">查看当前部门及下属部门</el-radio>
+              <el-radio border :label="3">查看本人</el-radio>
+            </el-radio-group>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" v-has="'sys:user:add:_save'" @click="onSubmit">{{$route.query.id?"保存":"创建"}}</el-button>
@@ -75,6 +81,7 @@
           status: 1,
           orgCode:'',
           roles: [],
+          checkType: 1
         },
         orgTree:[],
         roles: [],

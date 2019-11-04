@@ -1,5 +1,29 @@
 <template>
   <div>
+    <el-form :inline=true>
+      <el-form-item label="日期">
+        <el-date-picker
+          v-model="validTime"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期">
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="录入人">
+        <el-select v-model="filter.params.entryPerson" clearable>
+          <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="采购单位">
+        <el-select v-model="filter.params.entryPerson" clearable>
+          <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="loadData">搜索</el-button>
+      </el-form-item>
+    </el-form>
     <el-table
       :data="tableData"
       border
@@ -15,6 +39,10 @@
       <el-table-column
         prop="clientInstitutesName"
         label="院所名称">
+      </el-table-column>
+      <el-table-column
+        prop="followTime"
+        label="跟进日期">
       </el-table-column>
       <el-table-column
         prop="created"
@@ -35,6 +63,10 @@
       <el-table-column
         prop="description"
         label="结果描述">
+      </el-table-column>
+      <el-table-column
+        prop="addTime"
+        label="添加时间">
       </el-table-column>
       <el-table-column
         prop="img"
@@ -64,6 +96,7 @@
      data() {
          return {
            tableData: [],
+           validTime: [],
            filter: {
              count: 10, // 页大小
              page: 1, // 当前页
