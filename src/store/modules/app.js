@@ -95,7 +95,7 @@ const app = {
         api_app.menu().then(response => {
           let menu = arrSort(response.data.menuTrees, "children")
           commit("SET_MENU", menu)
-          debugger
+          // debugger
           commit("SET_PERMISSIONS", response.data.permissions)
           if (menu.length > 0) {
             commit("SET_ACTIVENAV", menu[0].permission)

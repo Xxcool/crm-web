@@ -109,15 +109,25 @@
               <span v-else-if="scope.row.sex===1">女</span>
             </template>
           </el-table-column>
-          <el-table-column prop="mobile" label="手机"></el-table-column>
-          <el-table-column prop="email" label="邮箱"></el-table-column>
+          <el-table-column prop="mobile" label="手机">
+            <template slot-scope="scope">
+              <span v-if="(scope.row.showStatus==0)&&(checkList.indexOf(scope.row.addUserId)==-1)">***********</span>
+              <span v-else>{{scope.row.mobile}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="email" label="邮箱">
+            <template slot-scope="scope">
+              <span v-if="(scope.row.showStatus==0)&&(checkList.indexOf(scope.row.addUserId)==-1)">***********</span>
+              <span v-else>{{scope.row.email}}</span>
+            </template>
+          </el-table-column>
           <el-table-column label="操作" width="300">
             <template slot-scope="scope">
               <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handelContactView(scope)">查看
               </el-button>
-              <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handelContactUpdate(scope)">编辑
+              <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handelContactUpdate(scope)" :disabled="checkList.indexOf(scope.row.addUserId)">编辑
               </el-button>
-              <el-button v-has="'supplier:supplier:edit'" type="danger" @click="handleContactDel(scope.row)">删除
+              <el-button v-has="'supplier:supplier:edit'" type="danger" @click="handleContactDel(scope.row)" :disabled="checkList.indexOf(scope.row.addUserId)">删除
               </el-button>
             </template>
           </el-table-column>
@@ -281,7 +291,7 @@
                   element-loading-text="拼命加载中...">
                   <el-table-column prop="contractType" label="合同类型">
                     <template slot-scope="scope">
-                     <span v-for="c in contractType">
+                     <span v-for="(c,index) in contractType" :key="index">
                       <span v-if="c.value == scope.row.contractType">
                         {{c.label}}
                       </span>
@@ -313,7 +323,7 @@
           <el-row>
             <el-col :span="10">
               <el-form-item label="合同类型">
-                <span v-for="c in contractType"  >
+                <span v-for="(c,index) in contractType" :key="index">
                   <span v-if="c.value == contract.contractType">
                     {{c.label}}
                   </span>
@@ -494,6 +504,7 @@
   import tag from "../../../api/sys/tag"
   import store from '../../../store/index'
   import logApi from "../../../api/sys/supplierLog"
+  import {mapGetters} from "vuex"
 
   export default {
     name: "supplier_detail",
@@ -517,6 +528,7 @@
         props: {
           label: "name"
         },
+        checkList: [], //当前用户有权限操作的用户ID列表
         concatTableData: [],
         tableData: [],
         multipleSelection: [],
@@ -547,6 +559,7 @@
         allTagList: [],
         contactData: {
           id: null,
+          addUserId: null,
           clientSupplierId: null,
           name: null,
           sex: null,
@@ -557,7 +570,8 @@
           weChat: null,
           phoneNumber: null,
           remark: null,
-          email: null
+          email: null,
+          showStatus: null
         },
         rules: {
           name: [{required: true, message: '不能为空', trigger: 'change'}],
@@ -600,6 +614,11 @@
         this.loadContactData();
       }
     },
+    computed: {
+      ...mapGetters([
+        "userInfo"
+      ]),
+    },
     methods: {
       loadContactData() {
         this.loading = true;
@@ -632,6 +651,7 @@
         api.contractType().then(res => {
           this.contractType = res.data;
         }).catch();
+        this.userCheckList();
       },
       handleCreate() {
         this.beforeContact();
@@ -673,6 +693,10 @@
       handelContactView(scope) {
         this.beforeContact();
         this.contactData = scope.row;
+        if((this.contactData.showStatus==0)&&(this.checkList.indexOf(scope.row.addUserId)==-1)){
+          this.contactData.email = '***********'
+          this.contactData.mobile = '***********'
+        }
         this.titleType = 'view';
         this.showContact = false;
         this.contactDisabled = true;
@@ -702,6 +726,11 @@
           remark: null,
           email: null
         };
+      },
+      userCheckList(){
+        api.checkList(this.userInfo.id).then(res => {
+          this.checkList = res.data
+        }).catch()
       },
       handlesupplierStatus() {
         this.showsupplier = false;

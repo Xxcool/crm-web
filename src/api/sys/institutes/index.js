@@ -44,6 +44,13 @@ export default {
       data
     })
   },
+  //获取当前用户有权限的用户ID
+  checkList(id) {
+    return request({
+      url: "/api/user/list-check-user/" + id,
+      method: "get"
+    })
+  },
 
   /**
    * 分配院所

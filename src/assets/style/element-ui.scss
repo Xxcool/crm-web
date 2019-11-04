@@ -143,3 +143,7 @@
 .el-table__fixed-header-wrapper th {
   background: #fafafa !important;
 }
+
+.el-date-editor--daterange.el-input__inner {
+  width: 240px !important;
+}
