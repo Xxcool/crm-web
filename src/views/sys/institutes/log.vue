@@ -41,11 +41,7 @@
         label="院所名称">
       </el-table-column>
       <el-table-column
-        prop="followTime"
-        label="跟进日期">
-      </el-table-column>
-      <el-table-column
-        prop="created"
+        prop="trackDate"
         label="跟踪日期">
       </el-table-column>
       <el-table-column
@@ -65,7 +61,7 @@
         label="结果描述">
       </el-table-column>
       <el-table-column
-        prop="addTime"
+        prop="created"
         label="添加时间">
       </el-table-column>
       <el-table-column

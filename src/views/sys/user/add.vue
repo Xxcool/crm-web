@@ -81,7 +81,7 @@
           status: 1,
           orgCode:'',
           roles: [],
-          checkType: 1
+          checkType: null
         },
         orgTree:[],
         roles: [],
