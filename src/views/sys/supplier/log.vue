@@ -11,13 +11,19 @@
         </el-date-picker>
       </el-form-item>
       <el-form-item label="录入人">
-        <el-select v-model="filter.params.entryPerson" clearable>
-          <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        <el-select v-model="filter.params.entryPersonId" clearable>
+          <el-option v-for="item in userList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="供应商">
-        <el-select v-model="filter.params.entryPerson" clearable>
-          <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        <el-select v-model="filter.params.clientId" filterable remote reserve-keyword placeholder="请输入采购单位名称"
+                    :remote-method="remoteMethod" clearable :loading="searchLoading">
+          <el-option
+            v-for="item in supplierList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -41,7 +47,7 @@
         label="商家名称">
       </el-table-column>
       <el-table-column
-        prop="created"
+        prop="trackDate"
         label="跟踪日期">
       </el-table-column>
       <el-table-column
@@ -92,6 +98,8 @@
     data() {
       return {
         tableData: [],
+        userList: [],
+        supplierList: [],
         validTime: [],
         filter: {
           count: 10, // 页大小
@@ -103,17 +111,25 @@
           }
         },
         total: 0,
-        loading: true
+        loading: true,
+        searchLoading: false
       }
     },
     created(){
+      api.getUsers().then(res => {
+        this.userList = res.data
+      })
+      api.supplierList({}).then(res => {
+        this.supplierList = res.data.results
+      })
       this.loadData();
     } ,
     methods:{
       loadData(){
+        this.filter.params.trackStartDate = this.validTime[0]
+        this.filter.params.trackEndDate = this.validTime[1]
         api.list(this.filter).then(res => {
           this.tableData = res.data.results;
-          console.log(this.tableData);
           this.total = res.data.count
           this.loading = false
         }).catch(() => {
@@ -121,7 +137,14 @@
         })
 
       },
-
+      remoteMethod(name) {
+          api.institutesList({params:{name:name}}).then(res => {
+            this.institutesList = res.data.results
+            this.searchLoading = false;
+          }).catch(() => {
+            this.searchLoading = false
+          });
+      },
     }
   }
 </script>

@@ -298,6 +298,9 @@
         <el-form-item label="结果描述">
           <el-input type="textarea" v-model="log.description"></el-input>
         </el-form-item>
+        <el-form-item label="跟踪日期">
+          <el-date-picker v-model="log.trackDate" type="date" placeholder="选择日期时间"></el-date-picker>
+        </el-form-item>
         <el-form-item label="备注">
           <el-input  v-model="log.remark"></el-input>
         </el-form-item>
@@ -491,6 +494,7 @@
           img:null,
           attachment:null,
           contractAttachment:null,
+          trackDate:null,
           remark:null,
           description:null
         },

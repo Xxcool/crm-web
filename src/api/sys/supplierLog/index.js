@@ -10,6 +10,21 @@ export default {
     })
   },
 
+  getUsers() {
+    return request({
+      url:"/api/user/select-all",
+      method:"post"
+    })
+  },
+
+  supplierList(data){
+    return request({
+      url:"/api/client/supplier/list",
+      method:"post",
+      data
+    })
+  },
+
   add(data){
     return request({
       url:"/api/client/supplier/log/add",

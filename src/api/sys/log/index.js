@@ -10,6 +10,22 @@ export default {
     })
   },
 
+  getUsers() {
+    return request({
+      url:"/api/user/select-all",
+      method:"post"
+    })
+  },
+
+  institutesList(data){
+    return request({
+      // url:"/api/basic/institutes/list",
+      url:"/api/client/institutes/list",
+      method:"post",
+      data
+    })
+  },
+
   add(data){
     return request({
       url:"/api/client/institutes/log/add",

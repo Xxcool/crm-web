@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-form :inline=true>
-      <el-form-item label="日期">
+      <el-form-item label="跟踪日期">
         <el-date-picker
           v-model="validTime"
           type="daterange"
@@ -11,13 +11,19 @@
         </el-date-picker>
       </el-form-item>
       <el-form-item label="录入人">
-        <el-select v-model="filter.params.entryPerson" clearable>
-          <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        <el-select v-model="filter.params.entryPersonId" clearable>
+          <el-option v-for="item in userList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="采购单位">
-        <el-select v-model="filter.params.entryPerson" clearable>
-          <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        <el-select v-model="filter.params.clientId" filterable remote reserve-keyword placeholder="请输入采购单位名称"
+                    :remote-method="remoteMethod" clearable :loading="searchLoading">
+          <el-option
+            v-for="item in institutesList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -91,37 +97,54 @@
      name: "institutes_log",
      data() {
          return {
-           tableData: [],
-           validTime: [],
-           filter: {
-             count: 10, // 页大小
-             page: 1, // 当前页
-             sort: '',
-             order: '',
-             params: {
+          tableData: [],
+          userList: [],
+          institutesList: [],
+          validTime: [],
+          filter: {
+            count: 10, // 页大小
+            page: 1, // 当前页
+            sort: '',
+            order: '',
+            params: {
 
-             }
-           },
-           total: 0,
-           loading: true
+            }
+          },
+          total: 0,
+          loading: true,
+          searchLoading: false,
          }
        },
      created(){
-       this.loadData();
-     } ,
+      api.getUsers().then(res => {
+        this.userList = res.data
+      })
+      api.institutesList({}).then(res => {
+        this.institutesList = res.data.results
+      })
+      this.loadData();
+     },
      methods:{
-       loadData(){
-         api.list(this.filter).then(res => {
-           this.tableData = res.data.results;
-           console.log(this.tableData);
-           this.total = res.data.count
-           this.loading = false
-         }).catch(() => {
-           this.loading = false
-         })
+      loadData(){
+        this.filter.params.trackStartDate = this.validTime[0]
+        this.filter.params.trackEndDate = this.validTime[1]
+        api.list(this.filter).then(res => {
+          this.tableData = res.data.results;
+          this.total = res.data.count
+          this.loading = false
+        }).catch(() => {
+          this.loading = false
+        })
 
-       },
-
+      },
+      remoteMethod(name) {
+          api.institutesList({params:{name:name}}).then(res => {
+            this.institutesList = res.data.results
+            this.searchLoading = false;
+          }).catch(() => {
+            this.searchLoading = false
+          });
+      },
      }
    }
 </script>
