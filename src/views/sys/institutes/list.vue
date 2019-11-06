@@ -92,7 +92,7 @@
         <template slot-scope="scope">
           <el-popover trigger="hover" placement="top">
             <p>{{scope.row.name}}</p>
-            <el-button slot="reference" class="nowrap" v-has="'supplier:supplier:view'" type="text" @click="viewDetail(scope)">{{scope.row.name}}</el-button>
+            <el-button slot="reference" class="nowrap" v-has="'sys:supplier:list'" type="text" @click="viewDetail(scope)">{{scope.row.name}}</el-button>
           </el-popover>
         </template>
       </el-table-column>
@@ -129,7 +129,7 @@
         prop="contactNumber"
         label="联系人数">
           <template slot-scope="scope">
-            <el-button v-has="'supplier:supplier:view'" type="text" @click="viewDetail(scope)">{{scope.row.contactNumber}}</el-button>
+            <el-button v-has="'sys:supplier:list'" type="text" @click="viewDetail(scope)">{{scope.row.contactNumber}}</el-button>
           </template>
       </el-table-column>
       <el-table-column
@@ -138,7 +138,7 @@
         <template slot-scope="scope">
           <el-popover trigger="hover" placement="top">
             <p>{{scope.row.person}}</p>
-            <div slot="reference" class="nowrap" v-has="'supplier:supplier:view'" type="text" >{{scope.row.person}}</div>
+            <div slot="reference" class="nowrap" v-has="'sys:supplier:list'" type="text" >{{scope.row.person}}</div>
           </el-popover>
         </template>
       </el-table-column>
