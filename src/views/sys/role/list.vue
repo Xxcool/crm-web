@@ -47,7 +47,7 @@
     </el-dialog>
     <el-dialog title="配置菜单" :visible.sync="dialogMenuVisible" width="400px">
       <div style="max-height: 400px;overflow-y: auto">
-        <tree v-model="checkedIds" :tree-data="menuList" :options="options"></tree>
+        <tree v-if="menuList.length > 0"  v-model="checkedIds" :tree-data="menuList" :options="options"></tree>
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogMenuVisible = false">取 消</el-button>
