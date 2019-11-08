@@ -28,6 +28,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="loadData">搜索</el-button>
+        <el-button type="primary" @click="exportData">导出</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -91,40 +92,41 @@
 </template>
 
 <script>
-   import api from "../../../api/sys/log"
+  import api from "../../../api/sys/log"
+  import {downloadFile} from "../../../utils"
 
-   export default {
-     name: "institutes_log",
-     data() {
-         return {
-          tableData: [],
-          userList: [],
-          institutesList: [],
-          validTime: [],
-          filter: {
-            count: 10, // 页大小
-            page: 1, // 当前页
-            sort: '',
-            order: '',
-            params: {
+  export default {
+    name: "institutes_log",
+    data() {
+      return {
+        tableData: [],
+        userList: [],
+        institutesList: [],
+        validTime: [],
+        filter: {
+          count: 10, // 页大小
+          page: 1, // 当前页
+          sort: '',
+          order: '',
+          params: {
 
-            }
-          },
-          total: 0,
-          loading: true,
-          searchLoading: false,
-         }
-       },
-     created(){
+          }
+        },
+        total: 0,
+        loading: true,
+        searchLoading: false,
+      }
+    },
+    created(){
       api.getUsers().then(res => {
         this.userList = res.data
       })
       api.institutesList({}).then(res => {
         this.institutesList = res.data.results
       })
-      this.loadData();
-     },
-     methods:{
+        this.loadData();
+      },
+    methods:{
       loadData(){
         this.filter.params.trackStartDate = this.validTime[0]
         this.filter.params.trackEndDate = this.validTime[1]
@@ -145,7 +147,12 @@
             this.searchLoading = false
           });
       },
-     }
-   }
+      exportData() {
+        api.exportData(this.filter.params).then(res => {
+          downloadFile(res.data, "客户跟踪信息")
+        })
+      }
+    }
+  }
 </script>
 
