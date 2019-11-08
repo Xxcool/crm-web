@@ -46,6 +46,7 @@ export default {
     return request({
       url:"/api/client/institutes/log/export",
       method:"post",
+      responseType: "blob",
       data
     })
   }
