@@ -92,7 +92,7 @@
         <template slot-scope="scope">
           <el-popover trigger="hover" placement="top">
             <p>{{scope.row.name}}</p>
-            <el-button slot="reference" class="nowrap" v-has="'supplier:supplier:view'" type="text" @click="viewDetail(scope)">{{scope.row.name}}</el-button>
+            <el-button slot="reference" class="nowrap" v-has="'sys:institutes:list'" type="text" @click="viewDetail(scope)">{{scope.row.name}}</el-button>
           </el-popover>
         </template>
       </el-table-column>
@@ -129,7 +129,7 @@
         prop="contactNumber"
         label="联系人数">
           <template slot-scope="scope">
-            <el-button v-has="'supplier:supplier:view'" type="text" @click="viewDetail(scope)">{{scope.row.contactNumber}}</el-button>
+            <el-button v-has="'sys:institutes:list'" type="text" @click="viewDetail(scope)">{{scope.row.contactNumber}}</el-button>
           </template>
       </el-table-column>
       <el-table-column
@@ -138,7 +138,7 @@
         <template slot-scope="scope">
           <el-popover trigger="hover" placement="top">
             <p>{{scope.row.person}}</p>
-            <div slot="reference" class="nowrap" v-has="'supplier:supplier:view'" type="text" >{{scope.row.person}}</div>
+            <div slot="reference" class="nowrap" v-has="'sys:institutes:list'" type="text" >{{scope.row.person}}</div>
           </el-popover>
         </template>
       </el-table-column>
@@ -174,7 +174,7 @@
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
               <p>{{scope.row.description}}</p>
-              <div slot="reference" class="nowrap" v-has="'supplier:supplier:view'" type="text" >{{scope.row.description}}</div>
+              <div slot="reference" class="nowrap" v-has="'sys:institutes:list'" type="text" >{{scope.row.description}}</div>
             </el-popover>
           </template>
       </el-table-column>
@@ -297,6 +297,9 @@
 
         <el-form-item label="结果描述">
           <el-input type="textarea" v-model="log.description"></el-input>
+        </el-form-item>
+        <el-form-item label="跟踪日期">
+          <el-date-picker v-model="log.trackDate" type="date" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
         <el-form-item label="备注">
           <el-input  v-model="log.remark"></el-input>
@@ -491,6 +494,7 @@
           img:null,
           attachment:null,
           contractAttachment:null,
+          trackDate:null,
           remark:null,
           description:null
         },

@@ -433,6 +433,12 @@
                           type="date" style="width: 60%">
           </el-date-picker>
         </el-form-item>
+        <el-form-item label="是否公开">
+          <template>
+            <el-radio v-model="contactData.showStatus" :label="1">是</el-radio>
+            <el-radio v-model="contactData.showStatus" :label="0">否</el-radio>
+          </template>
+        </el-form-item>
         <el-form-item label="备注">
           <el-input type="textarea" v-model="contactData.remark"></el-input>
         </el-form-item>
@@ -571,7 +577,7 @@
           phoneNumber: null,
           remark: null,
           email: null,
-          showStatus: null
+          showStatus: null,
         },
         rules: {
           name: [{required: true, message: '不能为空', trigger: 'change'}],
