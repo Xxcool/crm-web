@@ -91,10 +91,10 @@
       <el-tab-pane label="联系人">
         <div class="tools">
           <el-form :inline=true v-model="contacts.params">
-            <el-button @click="toOssContact" type="primary">同步oss系统联系人</el-button>
-            <el-button @click="exportContact" type="primary">导出联系人信息</el-button>
-            <el-button @click="handleCreate()" type="primary">新增联系人</el-button>
-            <el-button @click="goBack(true)">返回</el-button>
+            <el-button v-has="'institutes:institutes:sync'" @click="toOssContact" type="primary">同步oss系统联系人</el-button>
+            <el-button v-has="'institutes:institutes:out'" @click="exportContact" type="primary">导出联系人信息</el-button>
+            <el-button v-has="'institutes:institutes:add'" @click="handleCreate()" type="primary">新增联系人</el-button>
+            <el-button  @click="goBack(true)">返回</el-button>
             <div style="margin-top:10px;">
             <el-form-item label="性别">
               <el-select v-model="contacts.params.sex" clearable placeholder="请选择">
@@ -141,11 +141,11 @@
           <el-table-column prop="addUserName" label="添加人"></el-table-column>
           <el-table-column label="操作" width="300">
             <template slot-scope="scope">
-              <el-button v-has="'institutes:institutes:edit'" type="primary" @click="handelContactView(scope)">查看
+              <el-button type="primary" @click="handelContactView(scope)">查看
               </el-button>
               <el-button v-has="'institutes:institutes:edit'" type="primary" @click="handelContactUpdate(scope)" :disabled="checkList.indexOf(scope.row.addUserId)">编辑
               </el-button>
-              <el-button v-has="'institutes:institutes:edit'" type="danger" @click="handleContactDel(scope.row)" :disabled="checkList.indexOf(scope.row.addUserId)">删除
+              <el-button v-has="'institutes:institutes:del'" type="danger" @click="handleContactDel(scope.row)" :disabled="checkList.indexOf(scope.row.addUserId)">删除
               </el-button>
             </template>
           </el-table-column>
@@ -171,7 +171,7 @@
             </el-form-item>
             <br>
             <el-form-item>
-              <el-button v-has="'institutes:institutes:edit'" type="primary" @click="handleCreateLog()">添加跟踪信息</el-button>
+              <el-button v-has="'institutes:institutes:add_track'" type="primary" @click="handleCreateLog()">添加跟踪信息</el-button>
               <el-button @click="goBack(true)">返回</el-button>
             </el-form-item>
           </el-form>
