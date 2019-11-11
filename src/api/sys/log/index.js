@@ -40,6 +40,15 @@ export default {
       method:"post",
       data
     })
+  },
+
+  exportData(data){
+    return request({
+      url:"/api/client/institutes/log/export",
+      method:"post",
+      responseType: "blob",
+      data
+    })
   }
 
 }

@@ -121,6 +121,7 @@
               <span v-else>{{scope.row.email}}</span>
             </template>
           </el-table-column>
+          <el-table-column prop="addUserName" label="添加人"></el-table-column>
           <el-table-column label="操作" width="300">
             <template slot-scope="scope">
               <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handelContactView(scope)">查看

@@ -2,13 +2,12 @@
   <div>
     <el-form :inline=true>
       <el-form-item label="跟踪日期">
-        <el-date-picker
-          v-model="validTime"
-          type="daterange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期">
-        </el-date-picker>
+        <el-date-picker v-model="filter.params.trackStartDate" value-format="yyyy-MM-dd"
+        type="date" placeholder="开始时间"></el-date-picker>
+        -
+        <el-date-picker v-model="filter.params.trackEndDate" value-format="yyyy-MM-dd"
+        type="date" placeholder="结束时间"></el-date-picker>
+      </el-form-item>
       </el-form-item>
       <el-form-item label="录入人">
         <el-select v-model="filter.params.entryPersonId" clearable>
@@ -28,6 +27,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="loadData">搜索</el-button>
+        <el-button type="primary" @click="exportData">导出</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -91,31 +91,31 @@
 </template>
 
 <script>
-   import api from "../../../api/sys/log"
+  import api from "../../../api/sys/log"
+  import {downloadFile} from "../../../utils"
 
-   export default {
-     name: "institutes_log",
-     data() {
-         return {
-          tableData: [],
-          userList: [],
-          institutesList: [],
-          validTime: [],
-          filter: {
-            count: 10, // 页大小
-            page: 1, // 当前页
-            sort: '',
-            order: '',
-            params: {
+  export default {
+    name: "institutes_log",
+    data() {
+      return {
+        tableData: [],
+        userList: [],
+        institutesList: [],
+        filter: {
+          count: 10, // 页大小
+          page: 1, // 当前页
+          sort: '',
+          order: '',
+          params: {
 
-            }
-          },
-          total: 0,
-          loading: true,
-          searchLoading: false,
-         }
-       },
-     created(){
+          }
+        },
+        total: 0,
+        loading: true,
+        searchLoading: false,
+      }
+    },
+    created(){
       api.getUsers().then(res => {
         this.userList = res.data
       })
@@ -123,11 +123,9 @@
         this.institutesList = res.data.results
       })
       this.loadData();
-     },
-     methods:{
+    },
+    methods:{
       loadData(){
-        this.filter.params.trackStartDate = this.validTime[0]
-        this.filter.params.trackEndDate = this.validTime[1]
         api.list(this.filter).then(res => {
           this.tableData = res.data.results;
           this.total = res.data.count
@@ -145,7 +143,12 @@
             this.searchLoading = false
           });
       },
-     }
-   }
+      exportData() {
+        api.exportData(this.filter.params).then(res => {
+          downloadFile(res.data, "客户跟进日志")
+        })
+      }
+    }
+  }
 </script>
 

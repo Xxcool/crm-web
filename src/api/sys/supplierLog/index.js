@@ -39,6 +39,15 @@ export default {
       method:"post",
       data
     })
+  },
+
+  exportData(data){
+    return request({
+      url:"/api/client/supplier/log/export",
+      method:"post",
+      responseType: "blob",
+      data
+    })
   }
 
 }
