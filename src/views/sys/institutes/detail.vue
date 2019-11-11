@@ -141,11 +141,11 @@
           <el-table-column prop="addUserName" label="添加人"></el-table-column>
           <el-table-column label="操作" width="300">
             <template slot-scope="scope">
-              <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handelContactView(scope)">查看
+              <el-button v-has="'institutes:institutes:edit'" type="primary" @click="handelContactView(scope)">查看
               </el-button>
-              <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handelContactUpdate(scope)" :disabled="checkList.indexOf(scope.row.addUserId)">编辑
+              <el-button v-has="'institutes:institutes:edit'" type="primary" @click="handelContactUpdate(scope)" :disabled="checkList.indexOf(scope.row.addUserId)">编辑
               </el-button>
-              <el-button v-has="'supplier:supplier:edit'" type="danger" @click="handleContactDel(scope.row)" :disabled="checkList.indexOf(scope.row.addUserId)">删除
+              <el-button v-has="'institutes:institutes:edit'" type="danger" @click="handleContactDel(scope.row)" :disabled="checkList.indexOf(scope.row.addUserId)">删除
               </el-button>
             </template>
           </el-table-column>
@@ -171,7 +171,7 @@
             </el-form-item>
             <br>
             <el-form-item>
-              <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handleCreateLog()">添加跟踪信息</el-button>
+              <el-button v-has="'institutes:institutes:edit'" type="primary" @click="handleCreateLog()">添加跟踪信息</el-button>
               <el-button @click="goBack(true)">返回</el-button>
             </el-form-item>
           </el-form>
