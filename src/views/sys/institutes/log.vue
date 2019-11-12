@@ -8,7 +8,6 @@
         <el-date-picker v-model="filter.params.trackEndDate" value-format="yyyy-MM-dd"
         type="date" placeholder="结束时间"></el-date-picker>
       </el-form-item>
-      </el-form-item>
       <el-form-item label="录入人">
         <el-select v-model="filter.params.entryPersonId" clearable>
           <el-option v-for="item in userList" :key="item.id" :label="item.name" :value="item.id"></el-option>
