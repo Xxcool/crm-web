@@ -66,7 +66,7 @@
         label="结果描述">
       </el-table-column>
       <el-table-column
-        prop="addTime"
+        prop="created"
         label="添加时间">
       </el-table-column>
       <el-table-column

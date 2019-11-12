@@ -299,7 +299,7 @@
           <el-input type="textarea" v-model="log.description"></el-input>
         </el-form-item>
         <el-form-item label="跟踪日期">
-          <el-date-picker v-model="log.trackDate" type="date" placeholder="选择日期时间"></el-date-picker>
+          <el-date-picker v-model="log.trackDate" type="date" value-format="yyyy-MM-dd" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
         <el-form-item label="备注">
           <el-input  v-model="log.remark"></el-input>
