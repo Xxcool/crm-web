@@ -126,9 +126,9 @@
             <template slot-scope="scope">
               <el-button type="primary" @click="handelContactView(scope)">查看
               </el-button>
-              <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handelContactUpdate(scope)" :disabled="checkList.indexOf(scope.row.addUserId)">编辑
+              <el-button v-has="'supplier:supplier:edit'" type="primary" @click="handelContactUpdate(scope)" :disabled="!checkList.indexOf(scope.row.addUserId)">编辑
               </el-button>
-              <el-button v-has="'supplier:supplier:del'" type="danger" @click="handleContactDel(scope.row)" :disabled="checkList.indexOf(scope.row.addUserId)">删除
+              <el-button v-has="'supplier:supplier:del'" type="danger" @click="handleContactDel(scope.row)" :disabled="!checkList.indexOf(scope.row.addUserId)">删除
               </el-button>
             </template>
           </el-table-column>
