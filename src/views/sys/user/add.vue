@@ -90,7 +90,7 @@
           name: [{required: true, message: '用户名不能为空', trigger: 'change'}],
           email: [{required: true,trigger: 'blur', validator: this.isEmail}],
           roleId: [{required: true, message: '不能为空', trigger: 'change'}],
-          password: [{required: true, min: 6, max:20,message: "密码最少6位,最多20位",trigger: "change"}],
+         // password: [{required: true, min: 6, max:20,message: "密码最少6位,最多20位",trigger: "change"}],
           password_2: [{required: true,trigger: "change", validator: validatePassword_2}],
           roles: [{required: true, message: '请选择角色', trigger: 'change'}],
           orgCode: [{required: true, message: '请选择部门', trigger: 'change'}],
