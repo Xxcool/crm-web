@@ -120,6 +120,22 @@ export default {
       {"id":4,"value":"研发型企业"},
       {"id":5,"value":"其他"},
     ]
-  }
+  },
+
+  download(){
+    return request({
+      url:"/api/client/institutes/download-template",
+      method:"get",
+      responseType: "blob",
+    })
+  },
+
+  mul_import(data){
+    return request({
+      url:"/api/client/institutes/import",
+      method:"post",
+      data
+    })
+  },
 
 }

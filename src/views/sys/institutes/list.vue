@@ -65,6 +65,16 @@
         <el-button v-has="'sys:institutes:list:_batch_allot'" @click="handleUpdateStatusByIds()"  type="primary">批量分配</el-button>
         <el-button v-has="'sys:institutes:list:_export'" @click="exportInstitutes"  type="primary">导出客户信息</el-button>
         <el-button v-has="'sys:institutes:list:_add'" @click="handleCreate()"  type="primary">新增院所</el-button>
+        <el-button v-has="'sys:institutes:list:_add'" @click="downloadTemplate()"  type="primary">批量模板下载</el-button>
+        <el-upload style="margin-left:10px;"
+          class="upload-btn-inline"
+          action="/api/client/institutes/import"
+          multiple
+          :file-list="fileList"
+          :show-file-list="false"
+          :on-success="upload">
+          <el-button type="primary" v-has="'member:member:add:_import'">批量导入</el-button>
+        </el-upload>
       </el-form>
     </div>
     <el-table
@@ -426,12 +436,14 @@
   import store from '../../../store/index'
   import logApi from "../../../api/sys/log"
   import contact from "../../../api/sys/contact"
+  import {downloadFile} from "../../../utils"
 
   export default {
     name: "list",
     components: {selectTree},
     data() {
       return {
+        fileList: [],
         tableData: [],
         institutesData:[],
         rules:{
@@ -840,6 +852,34 @@
       closeDialog(){
         this.$refs.logForm.resetFields();
         this.dialogLogFormVisible=false;
+      },
+      downloadTemplate() {
+        api.download().then(res => {
+          downloadFile(res.data, "批量导入模板")
+        }).catch(() =>{
+          this.$message.error("下载异常！")
+        })
+      },
+      upload(res) {
+        if (res.status === 1001) {
+          this.$message({
+            message: "登录过期，请重新登录",
+            type: "error",
+            duration: 5 * 1000
+          })
+          setTimeout(() => {
+            store.dispatch("logOut")
+          }, 5 * 1000)
+        } else if (res.status === 0) {
+          this.$message.success("成功")
+          this.loadData();
+        } else {
+          this.$message({
+            message: "上传文件失败",
+            type: "error",
+            duration: 5 * 1000
+          })
+        }
       }
     }
   }
