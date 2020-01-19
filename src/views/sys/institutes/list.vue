@@ -55,8 +55,52 @@
             <el-option label="未上线" value="0"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item>
+        <el-form-item label="客户名称">
           <el-input v-model="filter.params.name" placeholder="请输入客户名称" ></el-input>
+        </el-form-item>
+        <el-form-item label="负责人名称">
+          <el-input v-model="filter.params.person" placeholder="请输入负责人名称" ></el-input>
+        </el-form-item>
+        <el-form-item label="归属地" >
+          <el-select
+            v-model="filter.params.stationId"
+            filterable
+            remote
+            clearable
+            placeholder="请选择"
+            :remote-method="stationMethod"
+            :loading="stationLoading">
+            <el-option v-for="item in stationList" :key="item.id" :label="item.name"
+                       :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="意向度">
+          <el-select v-model="filter.params.intention" clearable remote filterable>
+            <el-option label="一个月内签约" :value="0"></el-option>
+            <el-option label="三个月内签约" :value="1"></el-option>
+            <el-option label="高合作意向" :value="2"></el-option>
+            <el-option label="有了解意愿" :value="3"></el-option>
+            <el-option label="拒绝/排斥合作" :value="4"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="分配状态">
+          <el-select v-model="filter.params.status" clearable remote filterable>
+            <el-option label="已分配" value="1"></el-option>
+            <el-option label="未分配" value="0"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="录入人">
+          <el-input v-model="filter.params.userName" placeholder="请输入录入人" ></el-input>
+        </el-form-item>
+        <el-form-item label="录入时间">
+          <el-date-picker v-model="filter.startDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                          type="date" placeholder="开始时间" style="width: 60%">
+          </el-date-picker>
+          -
+          <el-date-picker v-model="filter.endDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                          type="date" placeholder="结束时间" style="width: 60%">
+          </el-date-picker>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="loadData">搜索</el-button>
@@ -105,6 +149,10 @@
             <el-button slot="reference" class="nowrap" v-has="'sys:institutes:list'" type="text" @click="viewDetail(scope)">{{scope.row.name}}</el-button>
           </el-popover>
         </template>
+      </el-table-column>
+      <el-table-column
+        prop="anotherName"
+        label="客户别名">
       </el-table-column>
       <el-table-column
         prop="type"
@@ -189,6 +237,17 @@
           </template>
       </el-table-column>
       <el-table-column
+        prop="intention"
+        label="意向度标签">
+        <template slot-scope="scope">
+          <span v-if="scope.row.intention===0">一个月内签约</span>
+          <span v-else-if="scope.row.intention===1">三个月内签约</span>
+          <span v-else-if="scope.row.intention===2">高合作意向</span>
+          <span v-else-if="scope.row.intention===3">有了解意愿</span>
+          <span v-else-if="scope.row.intention===4">拒绝/排斥合作</span>
+        </template>
+      </el-table-column>
+      <el-table-column
         label="操作"
         width="300"
         fixed="right">
@@ -226,6 +285,27 @@
             <el-option v-for="item in stationList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="别名" prop="anotherName">
+          <el-input v-model="institutes.anotherName" ></el-input>
+        </el-form-item>
+        <el-form-item label="所在地">
+          <el-cascader
+            expand-trigger="hover"
+            :options="options"
+            v-model="areaSelect"
+            @change="handleChange">
+          </el-cascader>
+        </el-form-item>
+        <el-form-item label=" 意向度">
+          <el-select v-model="institutes.intention" placeholder="请选择">
+            <el-option label="一个月内签约" :value="0"></el-option>
+            <el-option label="三个月内签约" :value="1"></el-option>
+            <el-option label="高合作意向" :value="2"></el-option>
+            <el-option label="有了解意愿" :value="3"></el-option>
+            <el-option label="拒绝/排斥合作" :value="4"></el-option>
+          </el-select>
+        </el-form-item>
+
         <el-form-item label="院所描述">
           <el-input type="textarea" v-model="institutes.remark"></el-input>
         </el-form-item>
@@ -342,6 +422,13 @@
             <el-option v-for="item in contactList" :key="item.name" :value="item.name" :label="item.name">{{item.name}}</el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="拜访形式">
+          <el-select v-model="log.visitType" clearable>
+            <el-option label="电话" :value="0"></el-option>
+            <el-option label="微信" :value="1"></el-option>
+            <el-option label="面访" :value="2"></el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogLogFormVisible = false">取 消</el-button>
@@ -428,6 +515,7 @@
 
 <script>
   import api from "../../../api/sys/institutes"
+  import app from "../../../api/app"
   import org from "../../../api/sys/org"
   import tag from "../../../api/sys/tag"
   import station from "../../../api/sys/station"
@@ -448,7 +536,8 @@
         institutesData:[],
         rules:{
           name:[{required:true,message:'不能为空',trigger:'change'}],
-          stationId: [{required: true, message: '请选择配送区', trigger: 'change'}]
+          stationId: [{required: true, message: '请选择配送区', trigger: 'change'}],
+          anotherName:[{required:true,message:'不能为空',trigger:'change'}],
         },
         filter: {
           count: 10, // 页大小
@@ -512,6 +601,7 @@
         },
         logFormRules: {
           trackDoings: [{required: true, message: '不能为空', trigger: 'change'}],
+          visitType:[{required: true, message: '请选择拜访形式', trigger: 'change'}],
         },
         stationList: [],
         dialogCreateFormVisible:false,
@@ -534,11 +624,15 @@
           label:"name"
         },
         imgList:[],
+        areaSelect:[],
+        options: [],
+        areas: [],
       };
     },
     created() {
       this.loadData();
       this.getOrgSelectTree();
+      this.loadArea([]);
     },
     methods: {
       loadData() {
@@ -591,6 +685,8 @@
       createData() {
         this.$refs.institutesForm.validate(valid => {
           if (valid) {
+            this.institutes.state = this.areas[0]; //取出省份
+            this.institutes.city = this.areas[1];  //取出市
             api.add(this.institutes).then(() => {
               this.dialogCreateFormVisible = false;
               this.$message.success("添加成功");
@@ -880,7 +976,69 @@
             duration: 5 * 1000
           })
         }
-      }
+      },
+
+      handleChange(val) {
+        console.log(val)
+        this.$emit('input', val);
+        let values = [];
+        for (let i = 0; i < this.options.length; i++) {
+          let value = this.options[i];
+          if (value.value === val[0]) {
+            values.push(value.dataValue);
+            if (value.children) {
+              for (let j = 0; j < value.children.length; j++) {
+                let child = value.children[j];
+                if (child.value === val[1]) {
+                  values.push(child.dataValue);
+                  break;
+                }
+              }
+            }
+            break
+          }
+        }
+        this.areas = values;
+      },
+
+      loadArea(areas){
+        app.provinces().then(res1 => {
+          /*this.options = res.data*/
+          let index = 0;
+          for (let i = 0; i < res1.data.length; i++) {
+            var data = {
+              dataValue: res1.data[i].value,
+              value: index++,
+              label: res1.data[i].label,
+              children: null
+            }
+            if (areas.length > 0) {
+              if (data.dataValue === areas[0]) {
+                this.areaSelect.push(data.value);
+              }
+            }
+            if (res1.data[i].children || res1.data[i].children.length > 0) {
+              data.children = [];
+              for (let j = 0; j < res1.data[i].children.length; j++) {
+                let subData = {
+                  dataValue: res1.data[i].children[j].value,
+                  value: index++,
+                  label: res1.data[i].children[j].label,
+                  children: null
+                };
+                data.children.push(subData)
+                if (areas.length > 1) {
+                  if (subData.dataValue === areas[1]) {
+                    this.areaSelect.push(subData.value);
+                  }
+                }
+              }
+            }
+            this.options.push(data)
+          }
+        }).catch(() => {
+        });
+      },
     }
   }
 </script>

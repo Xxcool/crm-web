@@ -5,34 +5,7 @@
         <div>
           <el-row>
             <el-col :span="12">
-              <el-form v-model="institutes" v-if="showInstitutes">
-                <el-form-item label="客户标签">
-                  <span v-for="item in institutes.tagNames" :key="item" :value="item" style="padding-right: 10px">{{item}}</span>
-                </el-form-item>
-                <el-form-item label="客户类型">
-                  <span>院所客户</span>
-                </el-form-item>
-                <el-form-item label="院所名称">
-                  <span>{{institutes.name}}</span>
-                </el-form-item>
-                <el-form-item label="院所描述">
-                  <span>{{institutes.remark}}</span>
-                </el-form-item>
-                <el-form-item label="院所类型">
-                  <span v-if="institutes.type===1">科研院所</span>
-                  <span v-if="institutes.type===2">高校</span>
-                  <span v-if="institutes.type===3">医疗机构</span>
-                  <span v-if="institutes.type===4">研发型企业</span>
-                  <span v-if="institutes.type===5">其他</span>
-                </el-form-item>
-                <el-form-item label="配送区域">
-                  <span>{{institutes.stationName}}</span>
-                </el-form-item>
-                <el-form-item>
-                  <el-button @click="handleInstitutesStatus" type="primary">编辑</el-button>
-                </el-form-item>
-              </el-form>
-              <el-form v-model="institutes" v-if="showInstitutesUpd">
+              <el-form v-model="institutes">
                 <el-form-item label="客户标签">
                   <span v-for="item in institutes.tagNames" :key="item" :value="item" style="padding-right: 10px">{{item}}</span>
                 </el-form-item>
@@ -61,6 +34,26 @@
                     :loading="stationLoading">
                     <el-option v-for="item in stationList" :key="item.id" :label="item.name"
                                :value="item.id"></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="别名">
+                  <el-input v-model="institutes.anotherName" ></el-input>
+                </el-form-item>
+                <el-form-item label="所在地">
+                  <el-cascader
+                    expand-trigger="hover"
+                    :options="options"
+                    v-model="areaSelect"
+                    @change="handleChange">
+                  </el-cascader>
+                </el-form-item>
+                <el-form-item label=" 意向度">
+                  <el-select v-model="institutes.intention" placeholder="请选择">
+                    <el-option label="一个月内签约" :value="0"></el-option>
+                    <el-option label="三个月内签约" :value="1"></el-option>
+                    <el-option label="高合作意向" :value="2"></el-option>
+                    <el-option label="有了解意愿" :value="3"></el-option>
+                    <el-option label="拒绝/排斥合作" :value="4"></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -179,9 +172,15 @@
             <el-timeline>
               <el-timeline-item v-for="(item,index) in logData" :key="index">
                 <el-card>
-                  <div class="info-title"><span class="padding-rigth">{{item.created}}</span><span
-                    class="padding-rigth">录入人：{{item.entryPerson}}</span><span class="padding-rigth">跟踪行为：{{item.trackDoings}}</span><span
-                    class="padding-rigth">客户联系人：{{item.contactPerson}}</span></div>
+                  <div class="info-title"><span class="padding-rigth">{{item.created}}</span>
+                    <span class="padding-rigth">录入人：{{item.entryPerson}}</span>
+                    <span class="padding-rigth">跟踪行为：{{item.trackDoings}}</span>
+                    <span class="padding-rigth">客户联系人：{{item.contactPerson}}</span>
+                    <span class="padding-rigth" v-if="item.visitType === 0">拜访形式：电话</span>
+                    <span class="padding-rigth" v-if="item.visitType === 1">拜访形式：微信</span>
+                    <span class="padding-rigth" v-if="item.visitType === 2">拜访形式：面访</span>
+
+                  </div>
                   <div class="info-title"><span class="padding-rigth">{{item.description}}</span></div>
                   <div class="info-title">
                     <a class="padding-rigth" target="_blank" v-if="item.img" :value="item.img" :href="item.img">附件图片</a>
@@ -552,6 +551,7 @@
 
 <script>
   import api from "../../../api/sys/institutes"
+  import app from "../../../api/app"
   import contact from "../../../api/sys/contact"
   import station from "../../../api/sys/station"
   import tag from "../../../api/sys/tag"
@@ -658,6 +658,9 @@
           id:null,
         },
         station:{},
+        areaSelect:[],
+        options: [],
+        areas: [],
       }
     },
     created() {
@@ -704,6 +707,10 @@
           this.typeList = api.typeList();
           this.account.params.institutesId = res.data.institutesId;
           this.accountNumberList();
+          let areas = [];
+          areas.push(res.data.state) ;//省份
+          areas.push(res.data.city) ;//市
+          this.loadArea(areas);
         }).catch(() => {
         });
         this.clientInstitutesId = this.$route.query.id;
@@ -798,10 +805,15 @@
       },
       handleCommitInstitutes() {
         this.institutes.tagCodes = this.$refs.tagTree.getCheckedKeys();
+        this.institutes.state = this.areas[0]; //取出省份
+        this.institutes.city = this.areas[1];  //取出市
         api.update(this.institutes).then(() => {
           this.$message.success("保存成功");
-          this.loadContactData();
-          this.handleInstitutesUpdStatus();
+          this.$store.dispatch("delView", this.$route).then(() => {
+            this.$router.push({name: "institutes_list", params: {noKeep: true}})
+          })
+          /*this.loadContactData();
+          this.handleInstitutesUpdStatus();*/
         }).catch(() => {
         })
       },
@@ -977,7 +989,70 @@
             duration: 5 * 1000
           })
         }
-      }
+      },
+
+      handleChange(val) {
+        console.log(val)
+        this.$emit('input', val);
+        let values = [];
+        for (let i = 0; i < this.options.length; i++) {
+          let value = this.options[i];
+          if (value.value === val[0]) {
+            values.push(value.dataValue);
+            if (value.children) {
+              for (let j = 0; j < value.children.length; j++) {
+                let child = value.children[j];
+                if (child.value === val[1]) {
+                  values.push(child.dataValue);
+                  break;
+                }
+              }
+            }
+            break
+          }
+        }
+        debugger
+        this.areas = values;
+      },
+
+      loadArea(areas){
+        app.provinces().then(res1 => {
+          /*this.options = res.data*/
+          let index = 0;
+          for (let i = 0; i < res1.data.length; i++) {
+            var data = {
+              dataValue: res1.data[i].value,
+              value: index++,
+              label: res1.data[i].label,
+              children: null
+            }
+            if (areas.length > 0) {
+              if (data.dataValue === areas[0]) {
+                this.areaSelect.push(data.value);
+              }
+            }
+            if (res1.data[i].children || res1.data[i].children.length > 0) {
+              data.children = [];
+              for (let j = 0; j < res1.data[i].children.length; j++) {
+                let subData = {
+                  dataValue: res1.data[i].children[j].value,
+                  value: index++,
+                  label: res1.data[i].children[j].label,
+                  children: null
+                };
+                data.children.push(subData)
+                if (areas.length > 1) {
+                  if (subData.dataValue === areas[1]) {
+                    this.areaSelect.push(subData.value);
+                  }
+                }
+              }
+            }
+            this.options.push(data)
+          }
+        }).catch(() => {
+        });
+      },
     }
   }
 </script>
