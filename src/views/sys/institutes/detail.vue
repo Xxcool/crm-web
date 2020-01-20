@@ -39,6 +39,15 @@
                 <el-form-item label="别名">
                   <el-input v-model="institutes.anotherName" ></el-input>
                 </el-form-item>
+                <el-form-item label="联系人">
+                  <el-input v-model="institutes.contact" ></el-input>
+                </el-form-item>
+                <el-form-item label="手机号">
+                  <el-input v-model="institutes.phone" ></el-input>
+                </el-form-item>
+                <el-form-item label="分配人员">
+                  <span>{{institutes.userName||""}}</span>
+                </el-form-item>
                 <el-form-item label="所在地">
                   <el-cascader
                     expand-trigger="hover"

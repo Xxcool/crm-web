@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="tools">
-      <el-form ref="searchForm" :inline="true" :model="filter">
+      <el-form ref="searchForm" :inline="true" :model="filter" size="small">
         <el-form-item label="组织机构">
           <select-tree  :options="selOrgTree" @selected="findTagTree()" v-model="orgCode"
                         :props="{
@@ -62,21 +62,16 @@
           <el-input v-model="filter.params.person" placeholder="请输入负责人名称" ></el-input>
         </el-form-item>
         <el-form-item label="归属地" >
-          <el-select
-            v-model="filter.params.stationId"
-            filterable
-            remote
-            clearable
-            placeholder="请选择"
-            :remote-method="stationMethod"
-            :loading="stationLoading">
-            <el-option v-for="item in stationList" :key="item.id" :label="item.name"
-                       :value="item.id"></el-option>
-          </el-select>
+            <el-cascader clearable
+              expand-trigger="hover"
+              :options="options"
+              v-model="regionList"
+              @change="selectFromChange">
+            </el-cascader>
         </el-form-item>
 
-        <el-form-item label="意向度">
-          <el-select v-model="filter.params.intention" clearable remote filterable>
+        <el-form-item label="意向度" >
+          <el-select v-model="filter.params.intention" clearable  size="small">
             <el-option label="一个月内签约" :value="0"></el-option>
             <el-option label="三个月内签约" :value="1"></el-option>
             <el-option label="高合作意向" :value="2"></el-option>
@@ -85,7 +80,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="分配状态">
-          <el-select v-model="filter.params.status" clearable remote filterable>
+          <el-select v-model="filter.params.status" clearable >
             <el-option label="已分配" value="1"></el-option>
             <el-option label="未分配" value="0"></el-option>
           </el-select>
@@ -110,9 +105,18 @@
         <el-button v-has="'sys:institutes:list:_export'" @click="exportInstitutes"  type="primary">导出客户信息</el-button>
         <el-button v-has="'sys:institutes:list:_add'" @click="handleCreate()"  type="primary">新增院所</el-button>
         <el-button v-has="'sys:institutes:list:_add'" @click="downloadTemplate()"  type="primary">批量模板下载</el-button>
-        <el-upload style="margin-left:10px;"
+        <!--<el-upload style="margin-left:10px;"
           class="upload-btn-inline"
           action="/api/client/institutes/import"
+          multiple
+          :file-list="fileList"
+          :show-file-list="false"
+          :on-success="upload">
+          <el-button type="primary" v-has="'member:member:add:_import'">批量导入</el-button>
+        </el-upload>-->
+        <el-upload style="margin-left:10px;"
+          class="upload-btn-inline"
+          action="/api/common/upload/4"
           multiple
           :file-list="fileList"
           :show-file-list="false"
@@ -144,10 +148,7 @@
         prop="name"
         label="客户名称">
         <template slot-scope="scope">
-          <el-popover trigger="hover" placement="top">
-            <p>{{scope.row.name}}</p>
-            <el-button slot="reference" class="nowrap" v-has="'sys:institutes:list'" type="text" @click="viewDetail(scope)">{{scope.row.name}}</el-button>
-          </el-popover>
+          <el-button slot="reference" class="nowrap" v-has="'sys:institutes:list'" type="text" @click="viewDetail(scope)">{{scope.row.name}}</el-button>
         </template>
       </el-table-column>
       <el-table-column
@@ -287,6 +288,12 @@
         </el-form-item>
         <el-form-item label="别名" prop="anotherName">
           <el-input v-model="institutes.anotherName" ></el-input>
+        </el-form-item>
+        <el-form-item label="联系人">
+          <el-input v-model="institutes.contact" ></el-input>
+        </el-form-item>
+        <el-form-item label="手机号">
+          <el-input v-model="institutes.phone" ></el-input>
         </el-form-item>
         <el-form-item label="所在地">
           <el-cascader
@@ -510,6 +517,13 @@
         <el-button type="primary" @click="freedData()">确 定</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="批量导入" :visible.sync="dialogTableVisible">
+      <el-table :data="errorList" :default-sort="{prop: 'rowNum', order: ''}">
+        <el-table-column property="rowNum" label="所在行"></el-table-column>
+        <el-table-column property="msg" label="备注"></el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -627,6 +641,11 @@
         areaSelect:[],
         options: [],
         areas: [],
+        //这俩是筛选框用的
+        regionList: [],
+        areaList: [],
+        dialogTableVisible: false,
+        errorList:[],
       };
     },
     created() {
@@ -636,6 +655,10 @@
     },
     methods: {
       loadData() {
+        if(this.areaList.length > 0){
+          this.filter.params.state = this.areaList[0];
+          this.filter.params.city = this.areaList[1];
+        }
         api.list(this.filter).then(res => {
           this.tableData = res.data.results;
           this.total = res.data.count
@@ -669,16 +692,16 @@
       },
       handleCreate() {
         this.stationMethod();
-        this.institutes={
-          id:null,
-            name:null,
-            type:null,
-            stationId:null,
-            remark:null,
-            allotRemark:null,
-            ids:[],
-            orgCodes:[],
-            userIds:[]
+        this.institutes = {
+          id: null,
+          name: null,
+          type: null,
+          stationId: null,
+          remark: null,
+          allotRemark: null,
+          ids: [],
+          orgCodes: [],
+          userIds: []
         };
         this.dialogCreateFormVisible = true;
       },
@@ -967,8 +990,17 @@
             store.dispatch("logOut")
           }, 5 * 1000)
         } else if (res.status === 0) {
-          this.$message.success("成功")
-          this.loadData();
+          api.import(res.data).then(res => {
+            if (res.data.length > 0) {
+              this.dialogTableVisible = true;
+              this.errorList = res.data;
+            } else {
+              this.$message.success("操作成功")
+              this.loadData();
+            }
+          }).catch(() => {
+          })
+
         } else {
           this.$message({
             message: "上传文件失败",
@@ -978,6 +1010,28 @@
         }
       },
 
+      selectFromChange(val){
+        console.log(val)
+        this.$emit('input', val);
+        let values = [];
+        for (let i = 0; i < this.options.length; i++) {
+          let value = this.options[i];
+          if (value.value === val[0]) {
+            values.push(value.dataValue);
+            if (value.children) {
+              for (let j = 0; j < value.children.length; j++) {
+                let child = value.children[j];
+                if (child.value === val[1]) {
+                  values.push(child.dataValue);
+                  break;
+                }
+              }
+            }
+            break
+          }
+        }
+        this.areaList = values;
+      },
       handleChange(val) {
         console.log(val)
         this.$emit('input', val);
