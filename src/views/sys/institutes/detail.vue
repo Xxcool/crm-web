@@ -39,12 +39,6 @@
                 <el-form-item label="别名">
                   <el-input v-model="institutes.anotherName" ></el-input>
                 </el-form-item>
-                <el-form-item label="联系人">
-                  <el-input v-model="institutes.contact" ></el-input>
-                </el-form-item>
-                <el-form-item label="手机号">
-                  <el-input v-model="institutes.phone" ></el-input>
-                </el-form-item>
                 <el-form-item label="分配人员">
                   <span>{{institutes.userName||""}}</span>
                 </el-form-item>
@@ -723,10 +717,11 @@
         }).catch(() => {
         });
         this.clientInstitutesId = this.$route.query.id;
-        this.contacts.params.clientInstitutesId = this.clientInstitutesId;
+        this.contacts.params.clientInstitutesId = this.clientInstitutesId ;
         this.stationMethod();
         contact.list(this.contacts).then(res => {
           this.concatTableData = res.data.results;
+          this.contactTotal = res.data.count;
           this.loading = false;
         }).catch(() => {
           this.loading = false;
@@ -889,13 +884,19 @@
           this.$message.warning("请先关联oss院所");
         } else {
           contact.ossMemberList(this.institutes.institutesId).then(res => {
-            this.contactDatas = res.data;
-            for (let i = 0; i < this.contactDatas.length; i++) {
-              this.contactDatas[i].clientInstitutesId = this.clientInstitutesId;
-              this.contactDatas[i].name = this.contactDatas[i].userName;
-              this.contactDatas[i].appellation = this.contactDatas[i].userName;
+            let contactList = [];
+            let dataList = res.data;
+            for (let i = 0; i < dataList.length; i++) {
+              let data = {
+                clientInstitutesId: this.clientInstitutesId,
+                name: dataList[i].name,
+                mobile: dataList[i].mobile,
+                email: dataList[i].email,
+                institutesRoleList: dataList[i].roles,
+              }
+              contactList.push(data)
             }
-            contact.addList(this.contactDatas).then(() => {
+            contact.addList(contactList).then(() => {
               this.$message.success("同步成功");
               this.loadContactData();
             }).catch(() => {
@@ -1027,6 +1028,7 @@
       loadArea(areas){
         app.provinces().then(res1 => {
           /*this.options = res.data*/
+          this.options = [];
           let index = 0;
           for (let i = 0; i < res1.data.length; i++) {
             var data = {
@@ -1059,6 +1061,7 @@
             }
             this.options.push(data)
           }
+          console.log(this.options)
         }).catch(() => {
         });
       },

@@ -274,7 +274,7 @@
             <el-option v-for="item in typeList" :key="item.id" :value="item.id" :label="item.value"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="配送区" prop="stationId">
+        <el-form-item label="配送区">
           <el-select
             v-model="institutes.stationId"
             filterable
@@ -286,14 +286,8 @@
             <el-option v-for="item in stationList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="别名" prop="anotherName">
+        <el-form-item label="别名">
           <el-input v-model="institutes.anotherName" ></el-input>
-        </el-form-item>
-        <el-form-item label="联系人">
-          <el-input v-model="institutes.contact" ></el-input>
-        </el-form-item>
-        <el-form-item label="手机号">
-          <el-input v-model="institutes.phone" ></el-input>
         </el-form-item>
         <el-form-item label="所在地">
           <el-cascader
