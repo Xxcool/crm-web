@@ -603,7 +603,8 @@
           freedRemark:null,
           ids:null,
           orgCodes:[],
-          userIds:[]
+          userIds:[],
+          intention:null
         },
         onLine:0,
         log:{
@@ -883,6 +884,7 @@
             this.institutes.description=this.log.description;
             this.log.clientInstitutesId=this.institutes.id;
             this.log.clientInstitutesName=this.institutes.name;
+            this.log.intention = this.institutes.intention;
             api.updateByOnLine(this.institutes).then(()=>{
               logApi.add(this.log).then(()=>{
                 this.$message.success("添加成功");
