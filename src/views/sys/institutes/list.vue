@@ -430,6 +430,18 @@
             <el-option label="面访" :value="2"></el-option>
           </el-select>
         </el-form-item>
+
+        <el-form-item label=" 意向度">
+          <el-select v-model="log.intention" placeholder="请选择">
+            <el-option label="一个月内签约" :value="0"></el-option>
+            <el-option label="三个月内签约" :value="1"></el-option>
+            <el-option label="高合作意向" :value="2"></el-option>
+            <el-option label="有了解意愿" :value="3"></el-option>
+            <el-option label="拒绝/排斥合作" :value="4"></el-option>
+          </el-select>
+        </el-form-item>
+
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogLogFormVisible = false">取 消</el-button>
@@ -605,7 +617,8 @@
           contractAttachment:null,
           trackDate:null,
           remark:null,
-          description:null
+          description:null,
+          intention:null
         },
         logFormRules: {
           trackDoings: [{required: true, message: '不能为空', trigger: 'change'}],
