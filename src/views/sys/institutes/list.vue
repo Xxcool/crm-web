@@ -260,7 +260,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total > filter.count" :total="total" :page.sync="filter.page"
+    <pagination :total="total" :page.sync="filter.page"
                 :pageSize.sync="filter.count" @pagination="loadData"/>
 
 
@@ -269,7 +269,7 @@
         <el-form-item label="客户名称" prop="name">
           <el-input v-model="institutes.name"></el-input>
         </el-form-item>
-        <el-form-item label="院所类型">
+        <el-form-item label="院所类型" prop="type">
           <el-select v-model="institutes.type">
             <el-option v-for="item in typeList" :key="item.id" :value="item.id" :label="item.value"></el-option>
           </el-select>
@@ -307,7 +307,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="院所描述">
+        <el-form-item label="院所描述" prop="remark">
           <el-input type="textarea" v-model="institutes.remark"></el-input>
         </el-form-item>
       </el-form>
@@ -386,10 +386,10 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item label="结果描述">
+        <el-form-item label="结果描述" prop="description">
           <el-input type="textarea" v-model="log.description"></el-input>
         </el-form-item>
-        <el-form-item label="跟踪日期">
+        <el-form-item label="跟踪日期" prop="trackDate">
           <el-date-picker v-model="log.trackDate" type="date" value-format="yyyy-MM-dd" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
         <el-form-item label="备注">
@@ -418,12 +418,12 @@
             <el-button slot="trigger" size="small" type="primary" @click="clearUploadedAttachment">点击上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item label="联系人选择">
+        <el-form-item label="联系人选择" prop="contactPerson">
           <el-select v-model="log.contactPerson" clearable>
             <el-option v-for="item in contactList" :key="item.name" :value="item.name" :label="item.name">{{item.name}}</el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="拜访形式">
+        <el-form-item label="拜访形式" prop="visitType">
           <el-select v-model="log.visitType" clearable>
             <el-option label="电话" :value="0"></el-option>
             <el-option label="微信" :value="1"></el-option>
@@ -556,8 +556,10 @@
         institutesData:[],
         rules:{
           name:[{required:true,message:'不能为空',trigger:'change'}],
+          type: [{required:true,message:'请选择院所类型',trigger:'change'}],
           stationId: [{required: true, message: '请选择配送区', trigger: 'change'}],
           anotherName:[{required:true,message:'不能为空',trigger:'change'}],
+          remark:[{required:true,message:'院所描述不能为空',trigger:'change'}]
         },
         filter: {
           count: 10, // 页大小
@@ -623,7 +625,10 @@
         },
         logFormRules: {
           trackDoings: [{required: true, message: '不能为空', trigger: 'change'}],
-          visitType:[{required: true, message: '请选择拜访形式', trigger: 'change'}],
+          visitType: [{required: true, message: '请选择拜访形式', trigger: 'change'}],
+          description: [{required: true, message: '请填写客户行为跟踪', trigger: 'change'}],
+          trackDate: [{required: true, message: '请填写跟踪日期', trigger: 'change'}],
+          contactPerson: [{required: true, message: '请选择联系人', trigger: 'change'}],
         },
         stationList: [],
         dialogCreateFormVisible:false,
@@ -716,6 +721,10 @@
       createData() {
         this.$refs.institutesForm.validate(valid => {
           if (valid) {
+            if(this.areas.length === 0){
+              this.$message.error("请选择所在地!");
+              return false;
+            }
             this.institutes.state = this.areas[0]; //取出省份
             this.institutes.city = this.areas[1];  //取出市
             api.add(this.institutes).then(() => {
@@ -723,7 +732,6 @@
               this.$message.success("添加成功");
               this.loadData();
             }).catch(() => {
-
             })
           }
         })
