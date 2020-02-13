@@ -37,8 +37,7 @@ export default {
 
   ossMemberList(id){
     return request({
-      url : "/api/member/member/find-by-institutesId?institutesId="+id,
-      method: "post",
+      url : "/api/basic/institutes/find-by-institutes-id?institutesId="+id,
     })
   },
 

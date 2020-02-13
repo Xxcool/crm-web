@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="tools">
-      <el-form ref="searchForm" :inline="true" :model="filter">
+      <el-form ref="searchForm" :inline="true" :model="filter" size="small">
         <el-form-item label="组织机构">
           <select-tree  :options="selOrgTree" @selected="findTagTree()" v-model="orgCode"
                         :props="{
@@ -55,6 +55,48 @@
             <el-option label="未上线" value="0"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="客户名称">
+          <el-input v-model="filter.params.name" placeholder="请输入客户名称" ></el-input>
+        </el-form-item>
+        <el-form-item label="负责人名称">
+          <el-input v-model="filter.params.person" placeholder="请输入负责人名称" ></el-input>
+        </el-form-item>
+        <el-form-item label="归属地" >
+          <el-cascader clearable
+                       expand-trigger="hover"
+                       :options="options"
+                       v-model="regionList"
+                       @change="selectFromChange">
+          </el-cascader>
+        </el-form-item>
+
+        <el-form-item label="意向度" >
+          <el-select v-model="filter.params.intention" clearable  size="small">
+            <el-option label="一个月内签约" :value="0"></el-option>
+            <el-option label="三个月内签约" :value="1"></el-option>
+            <el-option label="高合作意向" :value="2"></el-option>
+            <el-option label="有了解意愿" :value="3"></el-option>
+            <el-option label="拒绝/排斥合作" :value="4"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="分配状态">
+          <el-select v-model="filter.params.status" clearable >
+            <el-option label="已分配" value="1"></el-option>
+            <el-option label="未分配" value="0"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="录入人">
+          <el-input v-model="filter.params.userName" placeholder="请输入录入人" ></el-input>
+        </el-form-item>
+        <el-form-item label="录入时间">
+          <el-date-picker v-model="filter.startDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                          type="date" placeholder="开始时间" style="width: 60%">
+          </el-date-picker>
+          -
+          <el-date-picker v-model="filter.endDate" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                          type="date" placeholder="结束时间" style="width: 60%">
+          </el-date-picker>
+        </el-form-item>
         <el-form-item>
           <el-input v-model="filter.params.name" placeholder="请输入客户名称" ></el-input>
         </el-form-item>
@@ -66,15 +108,24 @@
         <el-button v-has="'sys:institutes:list:_export'" @click="exportInstitutes"  type="primary">导出客户信息</el-button>
         <el-button v-has="'sys:institutes:list:_add'" @click="handleCreate()"  type="primary">新增院所</el-button>
         <el-button v-has="'sys:institutes:list:_add'" @click="downloadTemplate()"  type="primary">批量模板下载</el-button>
-        <el-upload style="margin-left:10px;"
-          class="upload-btn-inline"
-          action="/api/client/institutes/import"
-          multiple
-          :file-list="fileList"
-          :show-file-list="false"
-          :on-success="upload">
-          <el-button type="primary" v-has="'member:member:add:_import'">批量导入</el-button>
-        </el-upload>
+          <!--<el-upload style="margin-left:10px;"
+            class="upload-btn-inline"
+            action="/api/client/institutes/import"
+            multiple
+            :file-list="fileList"
+            :show-file-list="false"
+            :on-success="upload">
+            <el-button type="primary" v-has="'member:member:add:_import'">批量导入</el-button>
+          </el-upload>-->
+          <el-upload style="margin-left:10px;"
+                     class="upload-btn-inline"
+                     action="/api/common/upload/4"
+                     multiple
+                     :file-list="fileList"
+                     :show-file-list="false"
+                     :on-success="upload">
+            <el-button type="primary" v-has="'member:member:add:_import'">批量导入</el-button>
+          </el-upload>
       </el-form>
     </div>
     <el-table
@@ -100,11 +151,12 @@
         prop="name"
         label="客户名称">
         <template slot-scope="scope">
-          <el-popover trigger="hover" placement="top">
-            <p>{{scope.row.name}}</p>
-            <el-button slot="reference" class="nowrap" v-has="'sys:institutes:list'" type="text" @click="viewDetail(scope)">{{scope.row.name}}</el-button>
-          </el-popover>
+          <el-button slot="reference" class="nowrap" v-has="'sys:institutes:list'" type="text" @click="viewDetail(scope)">{{scope.row.name}}</el-button>
         </template>
+      </el-table-column>
+      <el-table-column
+        prop="anotherName"
+        label="客户别名">
       </el-table-column>
       <el-table-column
         prop="type"
@@ -189,6 +241,17 @@
           </template>
       </el-table-column>
       <el-table-column
+        prop="intention"
+        label="意向度标签">
+        <template slot-scope="scope">
+          <span v-if="scope.row.intention===0">一个月内签约</span>
+          <span v-else-if="scope.row.intention===1">三个月内签约</span>
+          <span v-else-if="scope.row.intention===2">高合作意向</span>
+          <span v-else-if="scope.row.intention===3">有了解意愿</span>
+          <span v-else-if="scope.row.intention===4">拒绝/排斥合作</span>
+        </template>
+      </el-table-column>
+      <el-table-column
         label="操作"
         width="300"
         fixed="right">
@@ -200,7 +263,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total > filter.count" :total="total" :page.sync="filter.page"
+    <pagination :total="total" :page.sync="filter.page"
                 :pageSize.sync="filter.count" @pagination="loadData"/>
 
 
@@ -209,12 +272,12 @@
         <el-form-item label="客户名称" prop="name">
           <el-input v-model="institutes.name"></el-input>
         </el-form-item>
-        <el-form-item label="院所类型">
+        <el-form-item label="院所类型" prop="type">
           <el-select v-model="institutes.type">
             <el-option v-for="item in typeList" :key="item.id" :value="item.id" :label="item.value"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="配送区" prop="stationId">
+        <el-form-item label="配送区">
           <el-select
             v-model="institutes.stationId"
             filterable
@@ -226,7 +289,27 @@
             <el-option v-for="item in stationList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="院所描述">
+        <el-form-item label="别名">
+          <el-input v-model="institutes.anotherName" ></el-input>
+        </el-form-item>
+        <el-form-item label="所在地">
+          <el-cascader
+            expand-trigger="hover"
+            :options="options"
+            v-model="areaSelect"
+            @change="handleChange">
+          </el-cascader>
+        </el-form-item>
+        <el-form-item label=" 意向度">
+          <el-select v-model="institutes.intention" placeholder="请选择">
+            <el-option label="一个月内签约" :value="0"></el-option>
+            <el-option label="三个月内签约" :value="1"></el-option>
+            <el-option label="高合作意向" :value="2"></el-option>
+            <el-option label="有了解意愿" :value="3"></el-option>
+            <el-option label="拒绝/排斥合作" :value="4"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="院所描述" prop="remark">
           <el-input type="textarea" v-model="institutes.remark"></el-input>
         </el-form-item>
       </el-form>
@@ -259,12 +342,12 @@
 
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="dialogAllotFormVisible = false">取 消</el-button>
+      <el-button @click="closeDialogAllotFormVisible()">取 消</el-button>
       <el-button type="primary" @click="AllotData()">确 定</el-button>
     </div>
   </el-dialog>
 
-    <el-dialog title="客户分配" width="40%" :visible.sync="dialogAllotsFormVisible">
+    <el-dialog title="客户批量分配" width="40%" :visible.sync="dialogAllotsFormVisible">
       <el-form  label-width="80px" :model="institutes" :rules="rules">
         <el-form-item label="组织机构">
           <el-tree
@@ -305,10 +388,10 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item label="结果描述">
+        <el-form-item label="结果描述" prop="description">
           <el-input type="textarea" v-model="log.description"></el-input>
         </el-form-item>
-        <el-form-item label="跟踪日期">
+        <el-form-item label="跟踪日期" prop="trackDate">
           <el-date-picker v-model="log.trackDate" type="date" value-format="yyyy-MM-dd" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
         <el-form-item label="备注">
@@ -337,9 +420,16 @@
             <el-button slot="trigger" size="small" type="primary" @click="clearUploadedAttachment">点击上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item label="联系人选择">
+        <el-form-item label="联系人选择" prop="contactPerson">
           <el-select v-model="log.contactPerson" clearable>
             <el-option v-for="item in contactList" :key="item.name" :value="item.name" :label="item.name">{{item.name}}</el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="拜访形式" prop="visitType">
+          <el-select v-model="log.visitType" clearable>
+            <el-option label="电话" :value="0"></el-option>
+            <el-option label="微信" :value="1"></el-option>
+            <el-option label="面访" :value="2"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -423,11 +513,19 @@
         <el-button type="primary" @click="freedData()">确 定</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="批量导入" :visible.sync="dialogTableVisible">
+      <el-table :data="errorList" :default-sort="{prop: 'rowNum', order: ''}">
+        <el-table-column property="rowNum" label="所在行"></el-table-column>
+        <el-table-column property="msg" label="备注"></el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import api from "../../../api/sys/institutes"
+  import app from "../../../api/app"
   import org from "../../../api/sys/org"
   import tag from "../../../api/sys/tag"
   import station from "../../../api/sys/station"
@@ -448,7 +546,10 @@
         institutesData:[],
         rules:{
           name:[{required:true,message:'不能为空',trigger:'change'}],
-          stationId: [{required: true, message: '请选择配送区', trigger: 'change'}]
+          type: [{required:true,message:'请选择院所类型',trigger:'change'}],
+          stationId: [{required: true, message: '请选择配送区', trigger: 'change'}],
+          anotherName:[{required:true,message:'不能为空',trigger:'change'}],
+          remark:[{required:true,message:'院所描述不能为空',trigger:'change'}]
         },
         filter: {
           count: 10, // 页大小
@@ -494,7 +595,8 @@
           freedRemark:null,
           ids:null,
           orgCodes:[],
-          userIds:[]
+          userIds:[],
+          tagCodes:[],
         },
         onLine:0,
         log:{
@@ -511,7 +613,10 @@
           description:null
         },
         logFormRules: {
-          trackDoings: [{required: true, message: '不能为空', trigger: 'change'}],
+          visitType: [{required: true, message: '请选择拜访形式', trigger: 'change'}],
+          description: [{required: true, message: '请填写客户行为跟踪', trigger: 'change'}],
+          trackDate: [{required: true, message: '请填写跟踪日期', trigger: 'change'}],
+          contactPerson: [{required: true, message: '请选择联系人', trigger: 'change'}],
         },
         stationList: [],
         dialogCreateFormVisible:false,
@@ -531,17 +636,31 @@
         orgCode:null,
         showContract:false,
         props:{
+          children: 'children',
           label:"name"
         },
         imgList:[],
+        areaSelect:[],
+        options: [],
+        areas: [],
+        //这俩是筛选框用的
+        regionList: [],
+        areaList: [],
+        dialogTableVisible: false,
+        errorList:[],
       };
     },
     created() {
       this.loadData();
       this.getOrgSelectTree();
+      this.loadArea([]);
     },
     methods: {
       loadData() {
+        if(this.areaList.length > 0){
+          this.filter.params.state = this.areaList[0];
+          this.filter.params.city = this.areaList[1];
+        }
         api.list(this.filter).then(res => {
           this.tableData = res.data.results;
           this.total = res.data.count
@@ -575,22 +694,28 @@
       },
       handleCreate() {
         this.stationMethod();
-        this.institutes={
-          id:null,
-            name:null,
-            type:null,
-            stationId:null,
-            remark:null,
-            allotRemark:null,
-            ids:[],
-            orgCodes:[],
-            userIds:[]
+        this.institutes = {
+          id: null,
+          name: null,
+          type: null,
+          stationId: null,
+          remark: null,
+          allotRemark: null,
+          ids: [],
+          orgCodes: [],
+          userIds: []
         };
         this.dialogCreateFormVisible = true;
       },
       createData() {
         this.$refs.institutesForm.validate(valid => {
           if (valid) {
+            if(this.areas.length === 0){
+              this.$message.error("请选择所在地!");
+              return false;
+            }
+            this.institutes.state = this.areas[0]; //取出省份
+            this.institutes.city = this.areas[1];  //取出市
             api.add(this.institutes).then(() => {
               this.dialogCreateFormVisible = false;
               this.$message.success("添加成功");
@@ -637,8 +762,14 @@
         })
       } ,
       handleUpdateStatus(val){
+        this.institutes.userIds = [];
+        api.selectUserIdsByInstitutesId(val.row.id).then(res => {
+          this.institutes.userIds = res.data;
+        }).catch(() => {
+        })
+        this.institutes.tagCodes = [];
         this.institutes.id=val.row.id;
-        this.institutes.tagCodes = val.row.orgCodes
+        this.institutes.tagCodes = val.row.orgCodes;
         this.dialogAllotFormVisible=true;
       },
       handleUpdateStatusByIds(){
@@ -871,8 +1002,17 @@
             store.dispatch("logOut")
           }, 5 * 1000)
         } else if (res.status === 0) {
-          this.$message.success("成功")
-          this.loadData();
+          api.import(res.data).then(res => {
+            if (res.data.length > 0) {
+              this.dialogTableVisible = true;
+              this.errorList = res.data;
+            } else {
+              this.$message.success("操作成功")
+              this.loadData();
+            }
+          }).catch(() => {
+          })
+
         } else {
           this.$message({
             message: "上传文件失败",
@@ -880,8 +1020,114 @@
             duration: 5 * 1000
           })
         }
-      }
+      },
+      selectFromChange(val){
+        console.log(val)
+        this.$emit('input', val);
+        let values = [];
+        for (let i = 0; i < this.options.length; i++) {
+          let value = this.options[i];
+          if (value.value === val[0]) {
+            values.push(value.dataValue);
+            if (value.children) {
+              for (let j = 0; j < value.children.length; j++) {
+                let child = value.children[j];
+                if (child.value === val[1]) {
+                  values.push(child.dataValue);
+                  break;
+                }
+              }
+            }
+            break
+          }
+        }
+        this.areaList = values;
+      },
+      handleChange(val) {
+        console.log(val)
+        this.$emit('input', val);
+        let values = [];
+        for (let i = 0; i < this.options.length; i++) {
+          let value = this.options[i];
+          if (value.value === val[0]) {
+            values.push(value.dataValue);
+            if (value.children) {
+              for (let j = 0; j < value.children.length; j++) {
+                let child = value.children[j];
+                if (child.value === val[1]) {
+                  values.push(child.dataValue);
+                  break;
+                }
+              }
+            }
+            break
+          }
+        }
+        this.areas = values;
+      },
+
+      loadArea(areas){
+        app.provinces().then(res1 => {
+          /*this.options = res.data*/
+          let index = 0;
+          for (let i = 0; i < res1.data.length; i++) {
+            var data = {
+              dataValue: res1.data[i].value,
+              value: index++,
+              label: res1.data[i].label,
+              children: null
+            }
+            if (areas.length > 0) {
+              if (data.dataValue === areas[0]) {
+                this.areaSelect.push(data.value);
+              }
+            }
+            if (res1.data[i].children || res1.data[i].children.length > 0) {
+              data.children = [];
+              for (let j = 0; j < res1.data[i].children.length; j++) {
+                let subData = {
+                  dataValue: res1.data[i].children[j].value,
+                  value: index++,
+                  label: res1.data[i].children[j].label,
+                  children: null
+                };
+                data.children.push(subData)
+                if (areas.length > 1) {
+                  if (subData.dataValue === areas[1]) {
+                    this.areaSelect.push(subData.value);
+                  }
+                }
+              }
+            }
+            this.options.push(data)
+          }
+        }).catch(() => {
+        });
+      },
+      closeDialogAllotFormVisible(){
+        this.institutes ={
+          id:null,
+          institutesId:null,
+          onLine:null,
+          name:null,
+          userName:null,
+          userOrgName:null,
+          type:null,
+          stationId:null,
+          remark:null,
+          allotRemark:null,
+          freedRemark:null,
+          ids:null,
+          orgCodes:[],
+          userIds:[],
+          intention:null,
+          tagCodes:[],
+        };
+        this.dialogAllotFormVisible = false
+      },
     }
   }
 </script>
+
+
 
