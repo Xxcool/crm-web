@@ -57,7 +57,7 @@ export default {
 
   findOrgTag(code){
     return request({
-      url:"/api/tag/findOrgTag/"+code
+      url:"/api/tag/getTagTreeByOrg/"+code
     })
   }
 
