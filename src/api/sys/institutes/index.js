@@ -137,5 +137,15 @@ export default {
       data
     })
   },
-
+  import(filePath){
+    return request({
+      url:"/api/client/institutes/importData?filePath="+filePath,
+    })
+  },
+  selectUserIdsByInstitutesId(id) {
+    return request({
+      url:"/api/client/institutes/selectUserIdsByInstitutesId/"+id,
+      method: "get"
+    })
+  },
 }
