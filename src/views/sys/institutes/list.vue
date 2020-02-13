@@ -3,7 +3,7 @@
     <div class="tools">
       <el-form ref="searchForm" :inline="true" :model="filter" size="small">
         <el-form-item label="组织机构">
-          <select-tree  :options="selOrgTree" @selected="findTagTree()" v-model="orgCode"
+          <select-tree  :options="selOrgTree" @selected="changeOrg()" v-model="orgCode"
                         :props="{
                             parent: 'parentCode',
                             value: 'code',
@@ -13,12 +13,25 @@
           />
         </el-form-item>
         <br>
+
+
         <el-form-item label="客户标签">
-          <el-checkbox-group v-model="filter.params.tagCodes">
-              <el-checkbox v-for="item in tagList" :key="item.code" :label="item.code">{{item.name}}</el-checkbox>
-          </el-checkbox-group>
+
+          <el-tag
+            v-for="tag in selectTag"
+            :key="tag.name"
+            type="danger"
+            style="margin-left: 10px"
+          >
+            {{tag.name}}
+          </el-tag>
+        </el-form-item>
+
+        <el-form-item >
+          <el-button @click="findTagTree()"  type="primary">选择标签</el-button>
         </el-form-item>
         <br>
+
         <el-form-item label="上线合同签订日期">
           <el-date-picker v-model="filter.params.signBeginTime" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
                           type="date" placeholder="开始时间" style="width: 60%">
@@ -530,6 +543,28 @@
         <el-table-column property="msg" label="备注"></el-table-column>
       </el-table>
     </el-dialog>
+
+
+    <el-dialog title="选择标签" :visible.sync="dialogTagTreeVisible" width="400px">
+      <div style="max-height: 400px;overflow-y: auto">
+        <el-tree
+          v-if="tagTree.length > 0"
+          :data="tagTree"
+          show-checkbox
+          node-key="code"
+          check-strictly
+          ref="tree"
+          default-expand-all
+          current-node-key="filter.params.tagCodes"
+          :props="optionsTree">
+        </el-tree>
+
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogTagTreeVisible = false">取 消</el-button>
+        <el-button type="primary" @click="chooseTag" >确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -638,11 +673,39 @@
         dialogFreedFormVisible:false,
         stationLoading:false,
         dialogLogFormVisible:false,
+        dialogTagTreeVisible:false,
         multipleSelection: [],
         orgList:[],
         userList:[],
         selOrgTree:[],
         tagList:[],
+
+
+        selectTag:[
+        ],
+        tagTree:[
+          {
+            "checked":false,
+            "children":[
+              {
+
+                "code":88,
+                "name":"我是子标签",
+                "parentId":87
+              }],
+            "code":87,
+            "name":"我是一级菜单",
+            "parentId":0
+          }
+
+        ],
+        optionsTree: {
+          label: 'name',
+          depthOpen: 3,
+          addItem: true,
+          children: 'children'
+        },
+
         allTagList:[],
         contactList:[],
         orgCode:null,
@@ -848,10 +911,25 @@
       },
 
       findTagTree(){
+
+        this.dialogTagTreeVisible = true;
+      },
+      chooseTag(){
+        // console.info(this.checkedIds);
+
+        this.selectTag = this.$refs.tree.getCheckedNodes();
+        this.filter.params.tagCodes = this.$refs.tree.getCheckedKeys();
+        this.dialogTagTreeVisible = false;
+        console.info(this.filter.params.tagCodes );
+      },
+      changeOrg(){
+        this.selectTag = [];
+        this.filter.params.tagCodes=[];
         this.filter.params.tagCodes=[];
         tag.findOrgTag(this.orgCode).then(res=>{
-          this.tagList=res.data;
+          this.tagTree=res.data;
         })
+
       },
       handleCreateLog(val){
         this.institutes=val.row;
