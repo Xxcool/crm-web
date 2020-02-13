@@ -431,7 +431,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label=" 意向度2">
+        <el-form-item label=" 意向度">
           <el-select v-model="log.intention" placeholder="请选择">
             <el-option label="一个月内签约" :value="0"></el-option>
             <el-option label="三个月内签约" :value="1"></el-option>
