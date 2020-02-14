@@ -6,9 +6,7 @@
           <el-row>
             <el-col :span="12">
               <el-form v-model="institutes">
-                <el-form-item label="客户标签">
-                  <span v-for="item in institutes.tagNames" :key="item" :value="item" style="padding-right: 10px">{{item}}</span>
-                </el-form-item>
+
                 <el-form-item label="客户类型">
                   <span>院所客户</span>
                 </el-form-item>
@@ -1130,7 +1128,7 @@
         }).catch(() => {
         });
       },
-    }
+
   }
 </script>
 
