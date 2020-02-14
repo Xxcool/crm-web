@@ -14,7 +14,7 @@ module.exports = {
     open: true,
     proxy: {
       '/api': {
-        target:'http://crm.v3.casmart.com.cn', // 设置你调用的接口域名和端口号
+        target:'http://127.0.0.1:12248', // 设置你调用的接口域名和端口号
         ws:false,
         changeOrigin: true // 跨域
       }
