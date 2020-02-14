@@ -3,7 +3,7 @@
     <div class="tools">
       <el-form ref="searchForm" :inline="true" :model="filter" size="small">
         <el-form-item label="组织机构">
-          <select-tree  :options="selOrgTree" @selected="changeOrg()" v-model="orgCode"
+          <select-tree  :options="selOrgTree" @selected="findTagTree()" v-model="orgCode"
                         :props="{
                             parent: 'parentCode',
                             value: 'code',
@@ -353,12 +353,12 @@
 
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="dialogAllotFormVisible = false">取 消</el-button>
+      <el-button @click="closeDialogAllotFormVisible()">取 消</el-button>
       <el-button type="primary" @click="AllotData()">确 定</el-button>
     </div>
   </el-dialog>
 
-    <el-dialog title="客户分配" width="40%" :visible.sync="dialogAllotsFormVisible">
+    <el-dialog title="客户批量分配" width="40%" :visible.sync="dialogAllotsFormVisible">
       <el-form  label-width="80px" :model="institutes" :rules="rules">
         <el-form-item label="组织机构">
           <el-tree
@@ -711,6 +711,7 @@
         orgCode:null,
         showContract:false,
         props:{
+          children: 'children',
           label:"name"
         },
         imgList:[],
@@ -835,8 +836,14 @@
         })
       } ,
       handleUpdateStatus(val){
+        this.institutes.userIds = [];
+        api.selectUserIdsByInstitutesId(val.row.id).then(res => {
+          this.institutes.userIds = res.data;
+        }).catch(() => {
+        })
+        this.institutes.tagCodes = [];
         this.institutes.id=val.row.id;
-        this.institutes.tagCodes = val.row.orgCodes
+        this.institutes.tagCodes = val.row.orgCodes;
         this.dialogAllotFormVisible=true;
       },
       handleUpdateStatusByIds(){
@@ -1187,6 +1194,27 @@
           }
         }).catch(() => {
         });
+      },
+      closeDialogAllotFormVisible(){
+        this.institutes ={
+          id:null,
+          institutesId:null,
+          onLine:null,
+          name:null,
+          userName:null,
+          userOrgName:null,
+          type:null,
+          stationId:null,
+          remark:null,
+          allotRemark:null,
+          freedRemark:null,
+          ids:null,
+          orgCodes:[],
+          userIds:[],
+          intention:null,
+          tagCodes:[],
+        };
+        this.dialogAllotFormVisible = false
       },
     }
   }

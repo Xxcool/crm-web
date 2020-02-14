@@ -1065,6 +1065,71 @@
         }).catch(() => {
         });
       },
+      },
+
+      handleChange(val) {
+        console.log(val)
+        this.$emit('input', val);
+        let values = [];
+        for (let i = 0; i < this.options.length; i++) {
+          let value = this.options[i];
+          if (value.value === val[0]) {
+            values.push(value.dataValue);
+            if (value.children) {
+              for (let j = 0; j < value.children.length; j++) {
+                let child = value.children[j];
+                if (child.value === val[1]) {
+                  values.push(child.dataValue);
+                  break;
+                }
+              }
+            }
+            break
+          }
+        }
+        debugger
+        this.areas = values;
+      },
+
+      loadArea(areas){
+        app.provinces().then(res1 => {
+          /*this.options = res.data*/
+          this.options = [];
+          let index = 0;
+          for (let i = 0; i < res1.data.length; i++) {
+            var data = {
+              dataValue: res1.data[i].value,
+              value: index++,
+              label: res1.data[i].label,
+              children: null
+            }
+            if (areas.length > 0) {
+              if (data.dataValue === areas[0]) {
+                this.areaSelect.push(data.value);
+              }
+            }
+            if (res1.data[i].children || res1.data[i].children.length > 0) {
+              data.children = [];
+              for (let j = 0; j < res1.data[i].children.length; j++) {
+                let subData = {
+                  dataValue: res1.data[i].children[j].value,
+                  value: index++,
+                  label: res1.data[i].children[j].label,
+                  children: null
+                };
+                data.children.push(subData)
+                if (areas.length > 1) {
+                  if (subData.dataValue === areas[1]) {
+                    this.areaSelect.push(subData.value);
+                  }
+                }
+              }
+            }
+            this.options.push(data)
+          }
+        }).catch(() => {
+        });
+      },
     }
   }
 </script>
