@@ -3,7 +3,7 @@
     <div class="tools">
       <el-form ref="searchForm" :inline="true" :model="filter" size="small">
         <el-form-item label="组织机构">
-          <select-tree  :options="selOrgTree" @selected="findTagTree()" v-model="orgCode"
+          <select-tree  :options="selOrgTree" @selected="changeOrg()" v-model="orgCode"
                         :props="{
                             parent: 'parentCode',
                             value: 'code',
@@ -684,20 +684,6 @@
         selectTag:[
         ],
         tagTree:[
-          {
-            "checked":false,
-            "children":[
-              {
-
-                "code":88,
-                "name":"我是子标签",
-                "parentId":87
-              }],
-            "code":87,
-            "name":"我是一级菜单",
-            "parentId":0
-          }
-
         ],
         optionsTree: {
           label: 'name',
