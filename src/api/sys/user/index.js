@@ -31,7 +31,7 @@ export default {
   },
   selectAll(){
     return request({
-      url:'/api/user/select-all',
+      url:'/api/user/select-all-except-admin',
       method:"post"
     })
   },

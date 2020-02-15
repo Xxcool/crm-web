@@ -38,7 +38,7 @@
             />
             <el-radio-group v-model="form.checkType"
               style="margin-left:30px;">
-              <el-radio border :label="1">查看整个部门</el-radio>
+              <el-radio border :label="1">全公司</el-radio>
               <el-radio border :label="2">查看当前部门及下属部门</el-radio>
               <el-radio border :label="3">查看本人</el-radio>
             </el-radio-group>

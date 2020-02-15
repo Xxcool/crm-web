@@ -3,7 +3,7 @@
     <div class="tools">
       <el-form ref="searchForm" :inline="true" :model="filter" size="small">
         <el-form-item label="组织机构">
-          <select-tree  :options="selOrgTree" @selected="findTagTree()" v-model="orgCode"
+          <select-tree  :options="selOrgTree" @selected="changeOrg()" v-model="orgCode"
                         :props="{
                             parent: 'parentCode',
                             value: 'code',
@@ -13,12 +13,25 @@
           />
         </el-form-item>
         <br>
+
+
         <el-form-item label="客户标签">
-          <el-checkbox-group v-model="filter.params.tagCodes">
-              <el-checkbox v-for="item in tagList" :key="item.code" :label="item.code">{{item.name}}</el-checkbox>
-          </el-checkbox-group>
+
+          <el-tag
+            v-for="tag in selectTag"
+            :key="tag.name"
+            type="danger"
+            style="margin-left: 10px"
+          >
+            {{tag.name}}
+          </el-tag>
+        </el-form-item>
+
+        <el-form-item >
+          <el-button @click="findTagTree()"  type="primary">选择标签</el-button>
         </el-form-item>
         <br>
+
         <el-form-item label="上线合同签订日期">
           <el-date-picker v-model="filter.params.signBeginTime" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
                           type="date" placeholder="开始时间" style="width: 60%">
@@ -62,12 +75,12 @@
           <el-input v-model="filter.params.person" placeholder="请输入负责人名称" ></el-input>
         </el-form-item>
         <el-form-item label="归属地" >
-          <el-cascader clearable
-                       expand-trigger="hover"
-                       :options="options"
-                       v-model="regionList"
-                       @change="selectFromChange">
-          </el-cascader>
+            <el-cascader clearable
+              expand-trigger="hover"
+              :options="options"
+              v-model="regionList"
+              @change="selectFromChange">
+            </el-cascader>
         </el-form-item>
 
         <el-form-item label="意向度" >
@@ -98,9 +111,6 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-input v-model="filter.params.name" placeholder="请输入客户名称" ></el-input>
-        </el-form-item>
-        <el-form-item>
           <el-button type="primary" @click="loadData">搜索</el-button>
         </el-form-item>
         <br>
@@ -108,24 +118,24 @@
         <el-button v-has="'sys:institutes:list:_export'" @click="exportInstitutes"  type="primary">导出客户信息</el-button>
         <el-button v-has="'sys:institutes:list:_add'" @click="handleCreate()"  type="primary">新增院所</el-button>
         <el-button v-has="'sys:institutes:list:_add'" @click="downloadTemplate()"  type="primary">批量模板下载</el-button>
-          <!--<el-upload style="margin-left:10px;"
-            class="upload-btn-inline"
-            action="/api/client/institutes/import"
-            multiple
-            :file-list="fileList"
-            :show-file-list="false"
-            :on-success="upload">
-            <el-button type="primary" v-has="'member:member:add:_import'">批量导入</el-button>
-          </el-upload>-->
-          <el-upload style="margin-left:10px;"
-                     class="upload-btn-inline"
-                     action="/api/common/upload/4"
-                     multiple
-                     :file-list="fileList"
-                     :show-file-list="false"
-                     :on-success="upload">
-            <el-button type="primary" v-has="'member:member:add:_import'">批量导入</el-button>
-          </el-upload>
+        <!--<el-upload style="margin-left:10px;"
+          class="upload-btn-inline"
+          action="/api/client/institutes/import"
+          multiple
+          :file-list="fileList"
+          :show-file-list="false"
+          :on-success="upload">
+          <el-button type="primary" v-has="'member:member:add:_import'">批量导入</el-button>
+        </el-upload>-->
+        <el-upload style="margin-left:10px;"
+          class="upload-btn-inline"
+          action="/api/common/upload/4"
+          multiple
+          :file-list="fileList"
+          :show-file-list="false"
+          :on-success="upload">
+          <el-button type="primary" v-has="'member:member:add:_import'">批量导入</el-button>
+        </el-upload>
       </el-form>
     </div>
     <el-table
@@ -309,6 +319,7 @@
             <el-option label="拒绝/排斥合作" :value="4"></el-option>
           </el-select>
         </el-form-item>
+
         <el-form-item label="院所描述" prop="remark">
           <el-input type="textarea" v-model="institutes.remark"></el-input>
         </el-form-item>
@@ -432,6 +443,18 @@
             <el-option label="面访" :value="2"></el-option>
           </el-select>
         </el-form-item>
+
+        <el-form-item label=" 意向度">
+          <el-select v-model="log.intention" placeholder="请选择">
+            <el-option label="一个月内签约" :value="0"></el-option>
+            <el-option label="三个月内签约" :value="1"></el-option>
+            <el-option label="高合作意向" :value="2"></el-option>
+            <el-option label="有了解意愿" :value="3"></el-option>
+            <el-option label="拒绝/排斥合作" :value="4"></el-option>
+          </el-select>
+        </el-form-item>
+
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogLogFormVisible = false">取 消</el-button>
@@ -520,6 +543,28 @@
         <el-table-column property="msg" label="备注"></el-table-column>
       </el-table>
     </el-dialog>
+
+
+    <el-dialog title="选择标签" :visible.sync="dialogTagTreeVisible" width="400px">
+      <div style="max-height: 400px;overflow-y: auto">
+        <el-tree
+          v-if="tagTree.length > 0"
+          :data="tagTree"
+          show-checkbox
+          node-key="code"
+          check-strictly
+          ref="tree"
+          default-expand-all
+          current-node-key="filter.params.tagCodes"
+          :props="optionsTree">
+        </el-tree>
+
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogTagTreeVisible = false">取 消</el-button>
+        <el-button type="primary" @click="chooseTag" >确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -596,7 +641,7 @@
           ids:null,
           orgCodes:[],
           userIds:[],
-          tagCodes:[],
+          intention:null
         },
         onLine:0,
         log:{
@@ -610,9 +655,11 @@
           contractAttachment:null,
           trackDate:null,
           remark:null,
-          description:null
+          description:null,
+          intention:null
         },
         logFormRules: {
+          trackDoings: [{required: true, message: '不能为空', trigger: 'change'}],
           visitType: [{required: true, message: '请选择拜访形式', trigger: 'change'}],
           description: [{required: true, message: '请填写客户行为跟踪', trigger: 'change'}],
           trackDate: [{required: true, message: '请填写跟踪日期', trigger: 'change'}],
@@ -626,11 +673,25 @@
         dialogFreedFormVisible:false,
         stationLoading:false,
         dialogLogFormVisible:false,
+        dialogTagTreeVisible:false,
         multipleSelection: [],
         orgList:[],
         userList:[],
         selOrgTree:[],
         tagList:[],
+
+
+        selectTag:[
+        ],
+        tagTree:[
+        ],
+        optionsTree: {
+          label: 'name',
+          depthOpen: 3,
+          addItem: true,
+          children: 'children'
+        },
+
         allTagList:[],
         contactList:[],
         orgCode:null,
@@ -721,7 +782,6 @@
               this.$message.success("添加成功");
               this.loadData();
             }).catch(() => {
-
             })
           }
         })
@@ -844,10 +904,25 @@
       },
 
       findTagTree(){
+
+        this.dialogTagTreeVisible = true;
+      },
+      chooseTag(){
+        // console.info(this.checkedIds);
+
+        this.selectTag = this.$refs.tree.getCheckedNodes();
+        this.filter.params.tagCodes = this.$refs.tree.getCheckedKeys();
+        this.dialogTagTreeVisible = false;
+        console.info(this.filter.params.tagCodes );
+      },
+      changeOrg(){
+        this.selectTag = [];
+        this.filter.params.tagCodes=[];
         this.filter.params.tagCodes=[];
         tag.findOrgTag(this.orgCode).then(res=>{
-          this.tagList=res.data;
+          this.tagTree=res.data;
         })
+
       },
       handleCreateLog(val){
         this.institutes=val.row;
@@ -888,6 +963,7 @@
             this.institutes.description=this.log.description;
             this.log.clientInstitutesId=this.institutes.id;
             this.log.clientInstitutesName=this.institutes.name;
+            this.institutes.intention=this.log.intention ;
             api.updateByOnLine(this.institutes).then(()=>{
               logApi.add(this.log).then(()=>{
                 this.$message.success("添加成功");
@@ -1021,6 +1097,7 @@
           })
         }
       },
+
       selectFromChange(val){
         console.log(val)
         this.$emit('input', val);
@@ -1128,6 +1205,4 @@
     }
   }
 </script>
-
-
 
