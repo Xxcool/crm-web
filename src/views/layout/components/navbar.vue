@@ -34,7 +34,7 @@
             <span @click="logout">登出</span>
           </el-dropdown-item>
           <el-dropdown-item>
-            <router-link to="/user/change-password" tag="span">修改密码</router-link>
+            <router-link to="/user/changePassword" tag="span">修改密码</router-link>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
