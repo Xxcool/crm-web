@@ -51,6 +51,12 @@ const user = {
       component: () => import("../../views/sys/user/add.vue"),
       meta: {title: "修改用户", nav: "sys"}
     },
+    {
+      path: "changePassword",
+      name: "changePassword",
+      component: () => import("../../views/sys/user/changePassword.vue"),
+      meta: {title: "修改密码", nav: "sys"}
+    },
   ]
 }
 
