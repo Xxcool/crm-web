@@ -744,6 +744,11 @@
 
       },
       createContactData() {
+        if((this.contactData.mobile==null||this.contactData.mobile==""||typeof this.contactData.mobile=="undefined")&&
+            (this.contactData.phoneNumber==null||this.contactData.phoneNumber==""||typeof this.contactData.phoneNumber=="undefined")){
+          this.$message.error("手机号和座机号必须填写一个");
+          return;
+        }
         this.contactData.clientInstitutesId = this.clientInstitutesId;
         contact.add(this.contactData).then(() => {
           this.$message.success("添加成功");
