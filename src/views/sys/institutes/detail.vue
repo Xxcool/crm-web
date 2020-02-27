@@ -57,12 +57,17 @@
                     <el-option label="拒绝/排斥合作" :value="4"></el-option>
                   </el-select>
                 </el-form-item>
+                <el-form-item label="是否上线">
+                  <el-radio-group v-model="institutes.onLine">
+                    <el-radio :value="1" :label="1">是</el-radio>
+                    <el-radio :value="0" :label="0">否</el-radio>
+                  </el-radio-group>
+                </el-form-item>
                 <el-form-item>
                   <el-button @click="handleCommitInstitutes" type="primary">保存</el-button>
                   <el-button @click="handleInstitutesUpdStatus">取消</el-button>
                 </el-form-item>
               </el-form>
-
             </el-col>
             <el-col :span="12">
               <el-form ref="tagForm" label-position="left" label-width="100px"
@@ -577,6 +582,7 @@
           tagNames: null,
           description: null,
           tagCodes: [],
+          onLine:null
         },
         typeList: [],
         tagList: [],
@@ -932,7 +938,7 @@
           this.checkList = res.data
         }).catch()
       },
-      
+
       handleUploadImgSuccess(res, file) {
         if (res.status === 1001) {
           this.$message({
@@ -1131,4 +1137,3 @@
 
   }
 </script>
-

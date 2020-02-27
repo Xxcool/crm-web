@@ -392,12 +392,12 @@
             <el-option v-for="item in allTagList" :key="item.name" :value="item.name" :label="item.name"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="是否上线">
+        <!-- <el-form-item label="是否上线">
           <el-radio-group v-model="onLine" @change="checkLine()">
             <el-radio :value="1" :label="1">是</el-radio>
             <el-radio :value="0" :label="0">否</el-radio>
           </el-radio-group>
-        </el-form-item>
+        </el-form-item> -->
 
         <el-form-item label="结果描述" prop="description">
           <el-input type="textarea" v-model="log.description"></el-input>
@@ -426,11 +426,11 @@
             <el-button slot="trigger" size="small" type="primary" @click="clearUploadedImage">点击上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item label="上线合同"  v-if="showContract">
+        <!-- <el-form-item label="上线合同"  v-if="showContract">
           <el-upload class="upload-demo" v-if="dialogLogFormVisible" ref="upload" action="/api/common/upload/1" :on-success="uploadContractAttachment" :multiple=false>
             <el-button slot="trigger" size="small" type="primary" @click="clearUploadedAttachment">点击上传</el-button>
           </el-upload>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="联系人选择" prop="contactPerson">
           <el-select v-model="log.contactPerson" clearable>
             <el-option v-for="item in contactList" :key="item.name" :value="item.name" :label="item.name">{{item.name}}</el-option>
@@ -643,7 +643,7 @@
           userIds:[],
           intention:null
         },
-        onLine:0,
+        // onLine:0,
         log:{
           clientInstitutesId:null,
           clientInstitutesName:null,
@@ -695,7 +695,7 @@
         allTagList:[],
         contactList:[],
         orgCode:null,
-        showContract:false,
+        // showContract:false,
         props:{
           children: 'children',
           label:"name"
@@ -947,19 +947,19 @@
         this.dialogLogFormVisible=true;
       },
 
-      checkLine(){
-        if(this.onLine===0){
-          this.log.contractAttachment=null;
-          this.showContract=false;
-        }else{
-          this.showContract=true;
-        }
-      },
+      // checkLine(){
+      //   if(this.onLine===0){
+      //     this.log.contractAttachment=null;
+      //     this.showContract=false;
+      //   }else{
+      //     this.showContract=true;
+      //   }
+      // },
 
       commitLogData(){
         this.$refs.logForm.validate(valid => {
           if (valid) {
-            this.institutes.onLine=this.onLine;
+            // this.institutes.onLine=this.onLine;
             this.institutes.description=this.log.description;
             this.log.clientInstitutesId=this.institutes.id;
             this.log.clientInstitutesName=this.institutes.name;
@@ -1205,4 +1205,3 @@
     }
   }
 </script>
-
