@@ -2,6 +2,20 @@
   <div>
     <el-row :gutter="10">
       <el-col :span="24">
+        <el-col :span="10">
+            <el-card class="box-card">
+              <div slot="header" class="clearfix">
+                <span><i class="el-icon-date"></i> 今日业务</span>
+              </div>
+              <div class="content">
+                <el-form>
+                  <el-form-item label="采购单位客户即将释放" class="">
+                    <span class="status-1">{{boardData.releaseNum}}家</span>
+                  </el-form-item>
+                </el-form>
+              </div>
+            </el-card>
+          </el-col>
         <el-card class="box-card" style="margin-top: 10px">
           <el-collapse v-model="activeNames">
             <el-collapse-item title="demo" name="1">
@@ -59,14 +73,18 @@
 </template>
 
 <script>
-  import tree from '../../components/tree/index.vue'
-  import supplierDialog from '../../components/supplierDialog'
+  // import tree from '../../components/tree/index.vue'
+  // import supplierDialog from '../../components/supplierDialog'
+  import api from "../../api/dashboard"
 
   export default {
     name: "dashboard",
-    components: {tree,supplierDialog},
+    // components: {tree,supplierDialog},
     data() {
       return {
+        boardData:{
+          releaseNum:0
+        },
         activeNames: 1,
         checkedIds: [],
         treeData: [{
@@ -118,7 +136,16 @@
         }
       }
     },
-
+    created() {
+      this.loadData();
+    },
+    methods: {
+      loadData(){
+        api.releaseNum().then(res => {
+          this.boardData.releaseNum=res.data;
+        })
+      }
+    }
   }
 </script>
 
