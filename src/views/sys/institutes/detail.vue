@@ -11,7 +11,7 @@
                   <span>院所客户</span>
                 </el-form-item>
                 <el-form-item label="客户名称">
-                  <el-input v-model="institutes.name"></el-input>
+                  <el-input v-model="institutes.name" @blur="nameBlur"></el-input>
                 </el-form-item>
                 <el-form-item label="院所描述">
                   <el-input type="textarea" v-model="institutes.remark" style="width: 80%"></el-input>
@@ -668,6 +668,8 @@
         areaSelect:[],
         options: [],
         areas: [],
+        inspectionPassed:true,
+        historyName:null
       }
     },
     created() {
@@ -681,6 +683,31 @@
       ]),
     },
     methods: {
+      nameBlur(){
+        if(this.institutes.name==null||this.institutes.name==""){
+          this.$message.error("验证客户名称不能为空!");
+          return ;
+        }
+        if(this.historyName==this.institutes.name){
+          return;
+        }
+          api.sameName(this.institutes.name).then(res => {
+            if(res.success){
+                if(res.data){
+                    this.$message.error("客户名称重复!");
+                    this.inspectionPassed=false;
+                    return;
+                }
+                else{
+                  this.inspectionPassed=true;
+                }
+            }
+            else{
+              this.$message.error("验证客户名称异常!");
+              this.inspectionPassed=false;
+            }
+          })
+      },
       loadContactData() {
         this.loading = true;
         api.findById(this.$route.query.id).then(res => {
@@ -711,6 +738,7 @@
             }).catch();
           }
           this.institutes = res.data;
+          this.historyName=this.institutes.name;
           this.typeList = api.typeList();
           this.account.params.institutesId = res.data.institutesId;
           this.accountNumberList();
@@ -817,6 +845,10 @@
         this.showInstitutesUpd = false;
       },
       handleCommitInstitutes() {
+        if(!this.inspectionPassed){
+          this.$message.error("客户名称重复!");
+          return;
+        }
         this.institutes.tagCodes = this.$refs.tagTree.getCheckedKeys();
         this.institutes.state = this.areas[0]; //取出省份
         this.institutes.city = this.areas[1];  //取出市

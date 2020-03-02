@@ -280,7 +280,7 @@
     <el-dialog title="新增院所" width="40%" :visible.sync="dialogCreateFormVisible">
       <el-form ref="institutesForm" label-width="80px" :model="institutes" :rules="rules">
         <el-form-item label="客户名称" prop="name">
-          <el-input v-model="institutes.name"></el-input>
+          <el-input v-model="institutes.name" @blur="nameBlur"></el-input>
         </el-form-item>
         <el-form-item label="院所类型" prop="type">
           <el-select v-model="institutes.type">
@@ -709,6 +709,7 @@
         areaList: [],
         dialogTableVisible: false,
         errorList:[],
+        inspectionPassed:true
       };
     },
     created() {
@@ -717,6 +718,28 @@
       this.loadArea([]);
     },
     methods: {
+      nameBlur(){
+        if(this.institutes.name==null||this.institutes.name==""){
+          this.$message.error("验证客户名称不能为空!");
+          return ;
+        }
+          api.sameName(this.institutes.name).then(res => {
+            if(res.success){
+                if(res.data){
+                    this.$message.error("客户名称重复!");
+                    this.inspectionPassed=false;
+                    return;
+                }
+                else{
+                  this.inspectionPassed=true;
+                }
+            }
+            else{
+              this.$message.error("验证客户名称异常!");
+              this.inspectionPassed=false;
+            }
+          })
+      },
       loadData() {
         if(this.areaList.length > 0){
           this.filter.params.state = this.areaList[0];
@@ -769,6 +792,10 @@
         this.dialogCreateFormVisible = true;
       },
       createData() {
+        if(!this.inspectionPassed){
+          this.$message.error("客户名称重复!");
+          return;
+        }
         this.$refs.institutesForm.validate(valid => {
           if (valid) {
             if(this.areas.length === 0){
