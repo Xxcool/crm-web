@@ -43,6 +43,10 @@
               <el-radio border :label="3">查看本人</el-radio>
             </el-radio-group>
           </el-form-item>
+          <el-form-item label="客户管理数量" prop="manageNum">
+            <el-input-number v-model="form.manageNum" :min="0" label="客户管理数量"></el-input-number>
+            <span class="red">0代表不限制</span>
+          </el-form-item>
           <el-form-item>
             <el-button type="primary" v-has="'sys:user:add:_save'" @click="onSubmit">{{$route.query.id?"保存":"创建"}}</el-button>
             <el-button v-has="'sys:user:add:_cancel'" @click="handleCancel">取消</el-button>
@@ -81,7 +85,8 @@
           status: 1,
           orgCode:'',
           roles: [],
-          checkType: null
+          checkType: null,
+          manageNum:0
         },
         orgTree:[],
         roles: [],

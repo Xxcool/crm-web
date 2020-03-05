@@ -11,7 +11,7 @@
                   <span>院所客户</span>
                 </el-form-item>
                 <el-form-item label="客户名称">
-                  <el-input v-model="institutes.name"></el-input>
+                  <el-input v-model="institutes.name" @blur="nameBlur"></el-input>
                 </el-form-item>
                 <el-form-item label="院所描述">
                   <el-input type="textarea" v-model="institutes.remark" style="width: 80%"></el-input>
@@ -57,12 +57,17 @@
                     <el-option label="拒绝/排斥合作" :value="4"></el-option>
                   </el-select>
                 </el-form-item>
+                <el-form-item label="是否上线">
+                  <el-radio-group v-model="institutes.onLine">
+                    <el-radio :value="1" :label="1">是</el-radio>
+                    <el-radio :value="0" :label="0">否</el-radio>
+                  </el-radio-group>
+                </el-form-item>
                 <el-form-item>
                   <el-button @click="handleCommitInstitutes" type="primary">保存</el-button>
                   <el-button @click="handleInstitutesUpdStatus">取消</el-button>
                 </el-form-item>
               </el-form>
-
             </el-col>
             <el-col :span="12">
               <el-form ref="tagForm" label-position="left" label-width="100px"
@@ -479,7 +484,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer" v-if="showContact">
-        <el-button @click="dialogContactFormVisible = false">取 消</el-button>
+        <el-button @click="dialogContactForm()">取 消</el-button>
         <el-button type="primary" @click="createContactData()">确 定</el-button>
       </div>
     </el-dialog>
@@ -577,6 +582,7 @@
           tagNames: null,
           description: null,
           tagCodes: [],
+          onLine:null
         },
         typeList: [],
         tagList: [],
@@ -662,6 +668,8 @@
         areaSelect:[],
         options: [],
         areas: [],
+        inspectionPassed:true,
+        historyName:null
       }
     },
     created() {
@@ -675,6 +683,31 @@
       ]),
     },
     methods: {
+      nameBlur(){
+        if(this.institutes.name==null||this.institutes.name==""){
+          this.$message.error("验证客户名称不能为空!");
+          return ;
+        }
+        if(this.historyName==this.institutes.name){
+          return;
+        }
+          api.sameName(this.institutes.name).then(res => {
+            if(res.success){
+                if(res.data){
+                    this.$message.error("客户名称重复!");
+                    this.inspectionPassed=false;
+                    return;
+                }
+                else{
+                  this.inspectionPassed=true;
+                }
+            }
+            else{
+              this.$message.error("验证客户名称异常!");
+              this.inspectionPassed=false;
+            }
+          })
+      },
       loadContactData() {
         this.loading = true;
         api.findById(this.$route.query.id).then(res => {
@@ -705,6 +738,7 @@
             }).catch();
           }
           this.institutes = res.data;
+          this.historyName=this.institutes.name;
           this.typeList = api.typeList();
           this.account.params.institutesId = res.data.institutesId;
           this.accountNumberList();
@@ -738,6 +772,11 @@
 
       },
       createContactData() {
+        if((this.contactData.mobile==null||this.contactData.mobile==""||typeof this.contactData.mobile=="undefined")&&
+            (this.contactData.phoneNumber==null||this.contactData.phoneNumber==""||typeof this.contactData.phoneNumber=="undefined")){
+          this.$message.error("手机号和座机号必须填写一个");
+          return;
+        }
         this.contactData.clientInstitutesId = this.clientInstitutesId;
         contact.add(this.contactData).then(() => {
           this.$message.success("添加成功");
@@ -745,6 +784,10 @@
           this.dialogContactFormVisible = false;
         }).catch(() => {
         })
+      },
+      dialogContactForm() {
+        this.loadContactData();
+        this.dialogContactFormVisible = false;
       },
       handleContactDel(row) {
         this.$confirm('是否删除联系人【' + row.name + '】?', '提示', {
@@ -806,6 +849,10 @@
         this.showInstitutesUpd = false;
       },
       handleCommitInstitutes() {
+        if(!this.inspectionPassed){
+          this.$message.error("客户名称重复!");
+          return;
+        }
         this.institutes.tagCodes = this.$refs.tagTree.getCheckedKeys();
         this.institutes.state = this.areas[0]; //取出省份
         this.institutes.city = this.areas[1];  //取出市
@@ -932,7 +979,7 @@
           this.checkList = res.data
         }).catch()
       },
-      
+
       handleUploadImgSuccess(res, file) {
         if (res.status === 1001) {
           this.$message({
@@ -1131,4 +1178,3 @@
 
   }
 </script>
-

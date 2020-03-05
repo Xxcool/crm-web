@@ -148,4 +148,10 @@ export default {
       method: "get"
     })
   },
+  sameName(name){
+    return request({
+      url:"/api/client/institutes/same-name?name="+name,
+      method: "get"
+    })
+  }
 }
