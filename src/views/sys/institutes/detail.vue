@@ -484,7 +484,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer" v-if="showContact">
-        <el-button @click="dialogContactFormVisible = false">取 消</el-button>
+        <el-button @click="dialogContactForm()">取 消</el-button>
         <el-button type="primary" @click="createContactData()">确 定</el-button>
       </div>
     </el-dialog>
@@ -784,6 +784,10 @@
           this.dialogContactFormVisible = false;
         }).catch(() => {
         })
+      },
+      dialogContactForm() {
+        this.loadContactData();
+        this.dialogContactFormVisible = false;
       },
       handleContactDel(row) {
         this.$confirm('是否删除联系人【' + row.name + '】?', '提示', {
