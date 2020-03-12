@@ -38,7 +38,7 @@
                   <el-input v-model="institutes.anotherName" ></el-input>
                 </el-form-item>
                 <el-form-item label="分配人员">
-                  <span>{{institutes.userName||""}}</span>
+                  <span>{{institutes.person||""}}</span>
                 </el-form-item>
                 <el-form-item label="所在地">
                   <el-cascader
