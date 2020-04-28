@@ -55,6 +55,18 @@ export default {
     })
   },
 
+  findDepartment(){
+    return request({
+      url:"/api/client/institutes/contact/department"
+    })
+  },
+
+  findJobTitle(id){
+    return request({
+      url:"/api/client/institutes/contact/job-title?departmentId="+id
+    })
+  },
+
   download(params) {
     let data = params.data;
     request({

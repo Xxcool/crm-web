@@ -450,8 +450,23 @@
             <el-option :value="1" label="女"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="称呼">
-          <el-input v-model="contactData.appellation"></el-input>
+        <el-form-item label="部门/职务">
+          <el-select v-model="contactData.departmentId"  placeholder="请选择部门" @change="departmentChange">
+            <el-option
+              v-for="item in department"
+              :key="item.id"
+              :label="item.department"
+              :value="item.id">
+            </el-option>
+          </el-select>
+          <el-select v-model="contactData.jobTitleId" placeholder="请选择职务">
+            <el-option
+              v-for="item in jobTitle"
+              :key="item.id"
+              :label="item.jobTitle"
+              :value="item.id">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="手机">
           <el-input v-model="contactData.mobile"></el-input>
@@ -641,7 +656,9 @@
           phoneNumber: null,
           remark: null,
           email: null,
-          showStatus: null
+          showStatus: null,
+          jobTitleId:null,
+          departmentId:null
         },
         contactDatas: [],
         rules: {
@@ -669,7 +686,9 @@
         options: [],
         areas: [],
         inspectionPassed:true,
-        historyName:null
+        historyName:null,
+        department:[],
+        jobTitle:[]
       }
     },
     created() {
@@ -762,6 +781,20 @@
         this.selectContactAll();
         this.selectLogByInstitutes();
         this.userCheckList();
+        this.findDepartment();
+      },
+      findDepartment(){
+        contact.findDepartment().then((data)=>{
+            this.department=data.data;
+        }).catch(() => {})
+      },
+      findJobTitle(id){
+        contact.findJobTitle(id).then((data)=>{
+            this.jobTitle=data.data;
+        }).catch(() => {})
+      },
+      departmentChange(){
+        this.findJobTitle(this.contactData.departmentId);
       },
       handleCreate() {
         this.beforeContact();
