@@ -2,9 +2,9 @@
 import request from "../../../utils/request";
 
 export default {
-  tree(){
+  tree(tagType){
     return request({
-      url:"/api/tag/tree",
+      url:"/api/tag/tree/"+tagType,
       method:"post"
     })
   },
@@ -25,16 +25,16 @@ export default {
     })
   },
 
-  allList(){
+  allList(tagType){
     return request({
-      url:"/api/tag/allList",
+      url:"/api/tag/allList/"+tagType,
       method:"post"
     })
   },
 
-  del(code){
+  del(code,tagType){
     return request({
-      url:"/api/tag/del/"+code
+      url:"/api/tag/del/"+code+"/"+tagType
     })
   },
 
@@ -44,14 +44,14 @@ export default {
     })
   },
 
-  getOrgTagTree(code){
+  getOrgTagTree(code,tagType){
     return request({
-      url:"/api/tag/org-tag-tree/"+code
+      url:"/api/tag/org-tag-tree/"+code+"/"+tagType
     })
   },
-  getOrgTagTreeByInstitutesId(id){
+  getOrgTagTreeByInstitutesId(id,tagType){
     return request({
-      url:"/api/tag/org-tag-tree/institutes/"+id
+      url:"/api/tag/org-tag-tree/institutes/"+id+"/"+tagType
     })
   },
 

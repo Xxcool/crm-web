@@ -79,10 +79,18 @@ const tag={
   component: layout,
   children: [
     {
-      path: "list",
+      path: "list/:tagType",
       name: "tag_list",
+      tagType:0,
       component: () => import("../../views/sys/tag/list.vue"),
-      meta: {title: "客户标签列表", nav: "sys"}
+      meta: {title: "开发进度", nav: "sys"}
+    },
+    {
+      path: "business/list/:tagType",
+      name: "tag_business_list",
+      tagType:1,
+      component: () => import("../../views/sys/tag/list.vue"),
+      meta: {title: "业务范围", nav: "sys"}
     }
   ]
 

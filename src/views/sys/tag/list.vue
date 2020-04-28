@@ -9,7 +9,7 @@
         </el-table-column>
         <el-table-column label="操作" width="210">
           <template slot-scope="scope">
-            <el-button type="success" v-has="'sys:tag:list:_addChild'" @click="handleCreate(scope.row)">添加</el-button>
+            <!-- <el-button type="success" v-has="'sys:tag:list:_addChild'" @click="handleCreate(scope.row)">添加</el-button> -->
             <el-button type="primary" v-has="'sys:tag:list:_edit'" @click="handleUpdate(scope.row)">编辑</el-button>
             <el-button type="danger" v-has="'sys:tag:list:_del'" @click="handleDel(scope.row)">删除</el-button>
           </template>
@@ -77,7 +77,8 @@
         rules: {
           name: [{required: true, message: '不能为空', trigger: 'change'}],
           sort: [{required: true, message: '不能为空', trigger: 'change'}],
-        }
+        },
+        tagType:this.$route.params.tagType
       }
     },
     created() {
@@ -93,7 +94,7 @@
     methods: {
       menuList() {
         this.loading = true
-        api.tree().then(response => {
+        api.tree(this.tagType).then(response => {
           for (let i of response.data) {
             i["typeText"] = this.menuTypes[i.type];
           }
@@ -148,7 +149,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          api.del(row.code).then(() => {
+          api.del(row.code,this.tagType).then(() => {
             this.$message({
               type: 'success',
               message: '删除成功!'
@@ -164,6 +165,7 @@
         });
       },
       createData() {
+        this.temp.tagType=this.tagType;
         api.add(this.temp).then(() => {
           this.dialogFormVisible = false
           this.$message({
@@ -180,7 +182,6 @@
         })
       },
       updateData() {
-        console.log(this.temp)
         api.update(this.temp).then(() => {
           this.dialogFormVisible = false
           this.$message({
