@@ -74,8 +74,8 @@
                        style="width: 400px; margin-left:100px;">
                 <el-form-item label="选择客户标签">
                   <div v-for="(tag, index) in tagList" :key="index">
-                    <el-checkbox v-model="tag.checked">{{tag.name}}</el-checkbox>
-                    <el-select v-model="tag.parentCode" placeholder="请选择开展进度" v-show="tag.checked">
+                    <el-checkbox v-model="tag.checked" :disabled="tag.alreadyChecked">{{tag.name}}</el-checkbox>
+                    <el-select v-model="tag.parentCode" placeholder="请选择开展进度" v-show="tag.checked" :disabled="tag.alreadyChecked">
                       <el-option
                         v-for="item in businessTagList"
                         :key="item.code"
@@ -925,18 +925,26 @@
         })
       },
       handleTag() {
-        tag.tree(1).then(res => {
+        api.institutesTagTree(this.$route.query.id).then(res => {
           this.tagList = res.data;
-          this.tagList.forEach(function(val){
-              val.parentCode=null;
-          });
         });
         tag.tree(0).then(res => {
           this.businessTagList = res.data;
         });
       },
       tagCommit(){
-
+        let tagTreeObj={
+          id:this.$route.query.id,
+          tagTrees:this.tagList
+        };
+        api.addTagTree(tagTreeObj).then(res => {
+          if(res.status==0){
+            this.$message.success("客户标签添加成功");
+            this.loadContactData();
+            return;
+          }
+          this.$message.warning("客户标签添加失败");
+        });
       },
       selectContactAll() {
         contact.selectAll(this.clientInstitutesId).then(res => {

@@ -159,5 +159,12 @@ export default {
       url:"/api/client/institutes/tag/tree/"+id,
       method: "get"
     })
+  },
+  addTagTree(data){
+    return request({
+      url:"/api/client/institutes/add/tag",
+      method:"post",
+      data
+    })
   }
 }
