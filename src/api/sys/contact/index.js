@@ -67,6 +67,12 @@ export default {
     })
   },
 
+  findCascader(id){
+    return request({
+      url:"/api/client/institutes/contact/find/cascader?id="+id
+    })
+  },
+
   download(params) {
     let data = params.data;
     request({

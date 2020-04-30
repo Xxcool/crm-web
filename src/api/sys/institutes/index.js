@@ -166,5 +166,11 @@ export default {
       method:"post",
       data
     })
+  },
+  trackTag(id){
+    return request({
+      url:"/api/client/institutes/track/tag/"+id,
+      method:"get"
+    })
   }
 }
