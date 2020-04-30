@@ -70,17 +70,23 @@
               </el-form>
             </el-col>
             <el-col :span="12">
-              <el-form ref="tagForm" label-position="left" label-width="100px"
+              <el-form label-position="left" label-width="100px"
                        style="width: 400px; margin-left:100px;">
-                <el-form-item label="客户标签">
-                  <el-tree
-                    ref="tagTree"
-                    :data="tagList"
-                    show-checkbox
-                    node-key="code"
-                    :default-checked-keys="institutes.tagCodes"
-                    :props="props">
-                  </el-tree>
+                <el-form-item label="选择客户标签">
+                  <div v-for="(tag, index) in tagList" :key="index">
+                    <el-checkbox v-model="tag.checked">{{tag.name}}</el-checkbox>
+                    <el-select v-model="tag.parentCode" placeholder="请选择开展进度" v-show="tag.checked">
+                      <el-option
+                        v-for="item in businessTagList"
+                        :key="item.code"
+                        :label="item.name"
+                        :value="item.code">
+                      </el-option>
+                    </el-select>
+                  </div>
+                </el-form-item>
+                <el-form-item>
+                  <el-button @click="tagCommit" type="primary">保存</el-button>
                 </el-form-item>
               </el-form>
             </el-col>
@@ -601,6 +607,7 @@
         },
         typeList: [],
         tagList: [],
+        businessTagList:[],
         props: {
           label: "name"
         },
@@ -688,7 +695,8 @@
         inspectionPassed:true,
         historyName:null,
         department:[],
-        jobTitle:[]
+        jobTitle:[],
+        checkedtagType:[]
       }
     },
     created() {
@@ -917,9 +925,18 @@
         })
       },
       handleTag() {
-        tag.tree().then(res => {
+        tag.tree(1).then(res => {
           this.tagList = res.data;
+          this.tagList.forEach(function(val){
+              val.parentCode=null;
+          });
         });
+        tag.tree(0).then(res => {
+          this.businessTagList = res.data;
+        });
+      },
+      tagCommit(){
+
       },
       selectContactAll() {
         contact.selectAll(this.clientInstitutesId).then(res => {
