@@ -58,10 +58,19 @@
                   </el-select>
                 </el-form-item>
                 <el-form-item label="是否上线">
-                  <el-radio-group v-model="institutes.onLine">
+                  <el-radio-group v-model="institutes.onLine" >
                     <el-radio :value="1" :label="1">是</el-radio>
                     <el-radio :value="0" :label="0">否</el-radio>
                   </el-radio-group>
+                </el-form-item>
+                <el-form-item label="合同到期日期" v-show="institutes.onLine==1">
+                  <el-date-picker
+                    v-model="institutes.contractDate"
+                    type="daterange"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期">
+                  </el-date-picker>
                 </el-form-item>
                 <el-form-item>
                   <el-button @click="handleCommitInstitutes" type="primary">保存</el-button>
@@ -603,7 +612,8 @@
           tagNames: null,
           description: null,
           tagCodes: [],
-          onLine:null
+          onLine:null,
+          contractDate:null
         },
         typeList: [],
         tagList: [],
@@ -894,9 +904,15 @@
           this.$message.error("客户名称重复!");
           return;
         }
-        this.institutes.tagCodes = this.$refs.tagTree.getCheckedKeys();
+        // this.institutes.tagCodes = this.$refs.tagTree.getCheckedKeys();
         this.institutes.state = this.areas[0]; //取出省份
         this.institutes.city = this.areas[1];  //取出市
+        if(this.institutes.onLine==1){
+          if(this.institutes.contractDate==null||this.institutes.contractDate.length<=1){
+            this.$message.error("合同到期日期!");
+            return;
+          }
+        }
         api.update(this.institutes).then(() => {
           this.$message.success("保存成功");
           this.$store.dispatch("delView", this.$route).then(() => {
