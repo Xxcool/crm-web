@@ -65,12 +65,18 @@
                 </el-form-item>
                 <el-form-item label="合同到期日期" v-show="institutes.onLine==1">
                   <el-date-picker
-                    v-model="institutes.contractDate"
-                    type="daterange"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期">
-                  </el-date-picker>
+                   v-model="institutes.contractSignTime"
+                   type="date"
+                   format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                   placeholder="选择日期">
+                 </el-date-picker>
+                 至
+                 <el-date-picker
+                   v-model="institutes.contractEndTime"
+                   type="date"
+                   format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                   placeholder="选择日期">
+                 </el-date-picker>
                 </el-form-item>
                 <el-form-item>
                   <el-button @click="handleCommitInstitutes" type="primary">保存</el-button>
@@ -195,7 +201,8 @@
                 <el-card>
                   <div class="info-title"><span class="padding-rigth">{{item.created}}</span>
                     <span class="padding-rigth">录入人：{{item.entryPerson}}</span>
-                    <span class="padding-rigth">跟踪行为：{{item.trackDoings}}</span>
+                    <span class="padding-rigth">开发跟踪行为：{{item.trackDoings}}</span>
+                    <span class="padding-rigth">业务跟踪行为：{{item.businessTrackDoings}}</span>
                     <span class="padding-rigth">客户联系人：{{item.contactPerson}}</span>
                     <span class="padding-rigth" v-if="item.visitType === 0">拜访形式：电话</span>
                     <span class="padding-rigth" v-if="item.visitType === 1">拜访形式：微信</span>
@@ -613,7 +620,8 @@
           description: null,
           tagCodes: [],
           onLine:null,
-          contractDate:null
+          contractSignTime:null,
+          contractEndTime:null
         },
         typeList: [],
         tagList: [],
@@ -908,10 +916,14 @@
         this.institutes.state = this.areas[0]; //取出省份
         this.institutes.city = this.areas[1];  //取出市
         if(this.institutes.onLine==1){
-          if(this.institutes.contractDate==null||this.institutes.contractDate.length<=1){
-            this.$message.error("合同到期日期!");
+          if(this.institutes.contractSignTime==null||this.institutes.contractEndTime==null){
+            this.$message.error("合同到期日期必填!");
             return;
           }
+        }
+        else{
+          this.institutes.contractSignTime='';
+          this.institutes.contractEndTime='';
         }
         api.update(this.institutes).then(() => {
           this.$message.success("保存成功");

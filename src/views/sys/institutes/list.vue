@@ -234,6 +234,9 @@
         prop="contractSignTime"
         width="140"
         label="上线合同签订日期">
+        <template slot-scope="scope">
+            <p>{{scope.row.contractSignTime}}-{{scope.row.contractEndTime}}</p>
+        </template>
       </el-table-column>
       <el-table-column
         prop="modified"
@@ -249,6 +252,11 @@
               <div slot="reference" class="nowrap" v-has="'sys:institutes:list'" type="text" >{{scope.row.description}}</div>
             </el-popover>
           </template>
+      </el-table-column>
+      <el-table-column
+        prop="latestProgress"
+        width="140"
+        label="最新进展">
       </el-table-column>
       <el-table-column
         prop="intention"
