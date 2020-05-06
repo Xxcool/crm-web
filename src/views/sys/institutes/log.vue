@@ -55,7 +55,11 @@
       </el-table-column>
       <el-table-column
         prop="trackDoings"
-        label="跟踪行为">
+        label="业务范围">
+      </el-table-column>
+      <el-table-column
+        prop="businessTrackDoings"
+        label="开发进度">
       </el-table-column>
       <el-table-column
         prop="contactPerson"
@@ -150,4 +154,3 @@
     }
   }
 </script>
-

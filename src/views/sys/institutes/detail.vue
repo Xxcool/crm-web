@@ -58,10 +58,25 @@
                   </el-select>
                 </el-form-item>
                 <el-form-item label="是否上线">
-                  <el-radio-group v-model="institutes.onLine">
+                  <el-radio-group v-model="institutes.onLine" >
                     <el-radio :value="1" :label="1">是</el-radio>
                     <el-radio :value="0" :label="0">否</el-radio>
                   </el-radio-group>
+                </el-form-item>
+                <el-form-item label="合同到期日期" v-show="institutes.onLine==1">
+                  <el-date-picker
+                   v-model="institutes.contractSignTime"
+                   type="date"
+                   format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                   placeholder="选择日期">
+                 </el-date-picker>
+                 至
+                 <el-date-picker
+                   v-model="institutes.contractEndTime"
+                   type="date"
+                   format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+                   placeholder="选择日期">
+                 </el-date-picker>
                 </el-form-item>
                 <el-form-item>
                   <el-button @click="handleCommitInstitutes" type="primary">保存</el-button>
@@ -70,17 +85,23 @@
               </el-form>
             </el-col>
             <el-col :span="12">
-              <el-form ref="tagForm" label-position="left" label-width="100px"
+              <el-form label-position="left" label-width="100px"
                        style="width: 400px; margin-left:100px;">
-                <el-form-item label="客户标签">
-                  <el-tree
-                    ref="tagTree"
-                    :data="tagList"
-                    show-checkbox
-                    node-key="code"
-                    :default-checked-keys="institutes.tagCodes"
-                    :props="props">
-                  </el-tree>
+                <el-form-item label="选择客户标签">
+                  <div v-for="(tag, index) in tagList" :key="index">
+                    <el-checkbox v-model="tag.checked" :disabled="tag.alreadyChecked">{{tag.name}}</el-checkbox>
+                    <el-select v-model="tag.parentCode" placeholder="请选择开展进度" v-show="tag.checked" :disabled="tag.alreadyChecked">
+                      <el-option
+                        v-for="item in businessTagList"
+                        :key="item.code"
+                        :label="item.name"
+                        :value="item.code">
+                      </el-option>
+                    </el-select>
+                  </div>
+                </el-form-item>
+                <el-form-item>
+                  <el-button @click="tagCommit" type="primary">保存</el-button>
                 </el-form-item>
               </el-form>
             </el-col>
@@ -180,7 +201,8 @@
                 <el-card>
                   <div class="info-title"><span class="padding-rigth">{{item.created}}</span>
                     <span class="padding-rigth">录入人：{{item.entryPerson}}</span>
-                    <span class="padding-rigth">跟踪行为：{{item.trackDoings}}</span>
+                    <span class="padding-rigth">开发跟踪行为：{{item.trackDoings}}</span>
+                    <span class="padding-rigth">业务跟踪行为：{{item.businessTrackDoings}}</span>
                     <span class="padding-rigth">客户联系人：{{item.contactPerson}}</span>
                     <span class="padding-rigth" v-if="item.visitType === 0">拜访形式：电话</span>
                     <span class="padding-rigth" v-if="item.visitType === 1">拜访形式：微信</span>
@@ -450,8 +472,23 @@
             <el-option :value="1" label="女"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="称呼">
-          <el-input v-model="contactData.appellation"></el-input>
+        <el-form-item label="部门/职务">
+          <el-select v-model="contactData.departmentId"  placeholder="请选择部门" @change="departmentChange">
+            <el-option
+              v-for="item in department"
+              :key="item.id"
+              :label="item.department"
+              :value="item.id">
+            </el-option>
+          </el-select>
+          <el-select v-model="contactData.jobTitleId" placeholder="请选择职务">
+            <el-option
+              v-for="item in jobTitle"
+              :key="item.id"
+              :label="item.jobTitle"
+              :value="item.id">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="手机">
           <el-input v-model="contactData.mobile"></el-input>
@@ -582,10 +619,13 @@
           tagNames: null,
           description: null,
           tagCodes: [],
-          onLine:null
+          onLine:null,
+          contractSignTime:null,
+          contractEndTime:null
         },
         typeList: [],
         tagList: [],
+        businessTagList:[],
         props: {
           label: "name"
         },
@@ -641,7 +681,9 @@
           phoneNumber: null,
           remark: null,
           email: null,
-          showStatus: null
+          showStatus: null,
+          jobTitleId:null,
+          departmentId:null
         },
         contactDatas: [],
         rules: {
@@ -669,7 +711,10 @@
         options: [],
         areas: [],
         inspectionPassed:true,
-        historyName:null
+        historyName:null,
+        department:[],
+        jobTitle:[],
+        checkedtagType:[]
       }
     },
     created() {
@@ -762,6 +807,20 @@
         this.selectContactAll();
         this.selectLogByInstitutes();
         this.userCheckList();
+        this.findDepartment();
+      },
+      findDepartment(){
+        contact.findDepartment().then((data)=>{
+            this.department=data.data;
+        }).catch(() => {})
+      },
+      findJobTitle(id){
+        contact.findJobTitle(id).then((data)=>{
+            this.jobTitle=data.data;
+        }).catch(() => {})
+      },
+      departmentChange(){
+        this.findJobTitle(this.contactData.departmentId);
       },
       handleCreate() {
         this.beforeContact();
@@ -853,9 +912,19 @@
           this.$message.error("客户名称重复!");
           return;
         }
-        this.institutes.tagCodes = this.$refs.tagTree.getCheckedKeys();
+        // this.institutes.tagCodes = this.$refs.tagTree.getCheckedKeys();
         this.institutes.state = this.areas[0]; //取出省份
         this.institutes.city = this.areas[1];  //取出市
+        if(this.institutes.onLine==1){
+          if(this.institutes.contractSignTime==null||this.institutes.contractEndTime==null){
+            this.$message.error("合同到期日期必填!");
+            return;
+          }
+        }
+        else{
+          this.institutes.contractSignTime='';
+          this.institutes.contractEndTime='';
+        }
         api.update(this.institutes).then(() => {
           this.$message.success("保存成功");
           this.$store.dispatch("delView", this.$route).then(() => {
@@ -884,8 +953,25 @@
         })
       },
       handleTag() {
-        tag.tree().then(res => {
+        api.institutesTagTree(this.$route.query.id).then(res => {
           this.tagList = res.data;
+        });
+        tag.tree(0).then(res => {
+          this.businessTagList = res.data;
+        });
+      },
+      tagCommit(){
+        let tagTreeObj={
+          id:this.$route.query.id,
+          tagTrees:this.tagList
+        };
+        api.addTagTree(tagTreeObj).then(res => {
+          if(res.status==0){
+            this.$message.success("客户标签添加成功");
+            this.loadContactData();
+            return;
+          }
+          this.$message.warning("客户标签添加失败");
         });
       },
       selectContactAll() {

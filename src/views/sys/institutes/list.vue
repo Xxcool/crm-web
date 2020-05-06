@@ -234,6 +234,9 @@
         prop="contractSignTime"
         width="140"
         label="上线合同签订日期">
+        <template slot-scope="scope">
+            <p>{{scope.row.contractSignTime}}-{{scope.row.contractEndTime}}</p>
+        </template>
       </el-table-column>
       <el-table-column
         prop="modified"
@@ -249,6 +252,11 @@
               <div slot="reference" class="nowrap" v-has="'sys:institutes:list'" type="text" >{{scope.row.description}}</div>
             </el-popover>
           </template>
+      </el-table-column>
+      <el-table-column
+        prop="latestProgress"
+        width="140"
+        label="最新进展">
       </el-table-column>
       <el-table-column
         prop="intention"
@@ -387,18 +395,16 @@
 
     <el-dialog title="客户行为跟踪" width="40%" :visible.sync="dialogLogFormVisible" @close='closeDialog'>
       <el-form ref="logForm" label-width="80px" :model="log" :rules="logFormRules">
-        <el-form-item label="跟踪行为" prop="trackDoings">
-          <el-select v-model="log.trackDoings" clearable>
-            <el-option v-for="item in allTagList" :key="item.name" :value="item.name" :label="item.name"></el-option>
+        <el-form-item label="业务范围" prop="trackDoings">
+          <el-select v-model="log.trackDoings" clearable @change="developChange($event)">
+            <el-option v-for="item in allTagList" :key="item.code" :value="item.code" :label="item.name"></el-option>
           </el-select>
         </el-form-item>
-        <!-- <el-form-item label="是否上线">
-          <el-radio-group v-model="onLine" @change="checkLine()">
-            <el-radio :value="1" :label="1">是</el-radio>
-            <el-radio :value="0" :label="0">否</el-radio>
-          </el-radio-group>
-        </el-form-item> -->
-
+        <el-form-item label="开展进度" prop="businessTrackDoings">
+          <el-select v-model="log.businessTrackDoings" clearable>
+            <el-option v-for="item in filterTagList" :key="item.code" :value="item.code" :label="item.name"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="结果描述" prop="description">
           <el-input type="textarea" v-model="log.description"></el-input>
         </el-form-item>
@@ -432,9 +438,12 @@
           </el-upload>
         </el-form-item> -->
         <el-form-item label="联系人选择" prop="contactPerson">
-          <el-select v-model="log.contactPerson" clearable>
+          <el-cascader
+              v-model="log.contactPerson"
+              :options="cascaderList" :show-all-levels="false"></el-cascader>
+          <!-- <el-select v-model="log.contactPerson" clearable>
             <el-option v-for="item in contactList" :key="item.name" :value="item.name" :label="item.name">{{item.name}}</el-option>
-          </el-select>
+          </el-select> -->
         </el-form-item>
         <el-form-item label="拜访形式" prop="visitType">
           <el-select v-model="log.visitType" clearable>
@@ -649,6 +658,7 @@
           clientInstitutesName:null,
           entryPerson:null,
           trackDoings:null,
+          businessTrackDoings:null,
           contactPerson:null,
           img:null,
           attachment:null,
@@ -660,6 +670,7 @@
         },
         logFormRules: {
           trackDoings: [{required: true, message: '不能为空', trigger: 'change'}],
+          businessTrackDoings: [{required: true, message: '不能为空', trigger: 'change'}],
           visitType: [{required: true, message: '请选择拜访形式', trigger: 'change'}],
           description: [{required: true, message: '请填写客户行为跟踪', trigger: 'change'}],
           trackDate: [{required: true, message: '请填写跟踪日期', trigger: 'change'}],
@@ -693,7 +704,10 @@
         },
 
         allTagList:[],
+        businessTagList:[],
+        filterTagList:[],
         contactList:[],
+        cascaderList:[],
         orgCode:null,
         // showContract:false,
         props:{
@@ -949,21 +963,40 @@
         tag.findOrgTag(this.orgCode).then(res=>{
           this.tagTree=res.data;
         })
-
+      },
+      developChange(val){
+        let tagObj= this.allTagList.find(function(obj){
+          if(obj.code==val){
+            return obj;
+          }
+        });
+        let businessObj= this.businessTagList.find(function(obj){
+          if(obj.code==tagObj.parentCode){
+            return obj;
+          }
+        });
+        this.filterTagList=this.businessTagList.filter(item=>item.sort>=businessObj.sort);
       },
       handleCreateLog(val){
         this.institutes=val.row;
-        tag.getOrgTagTreeByInstitutesId(val.row.id).then(res=>{
+        api.trackTag(val.row.id,1).then(res=>{
           this.allTagList=res.data;
         });
-        contact.selectAll(val.row.id).then(res=>{
-          this.contactList=res.data;
+        tag.tree(0).then(res => {
+          this.businessTagList = res.data;
         });
+        contact.findCascader(val.row.id).then(res=>{
+          this.cascaderList=res.data;
+        });
+        // contact.selectAll(val.row.id).then(res=>{
+        //   this.contactList=res.data;
+        // });
         this.log = {
           clientInstitutesId: null,
           clientInstitutesName: null,
           entryPerson: null,
           trackDoings: null,
+          businessTrackDoings:null,
           contactPerson: null,
           img: null,
           attachment: null,
@@ -986,11 +1019,27 @@
       commitLogData(){
         this.$refs.logForm.validate(valid => {
           if (valid) {
+            let thisLog=this;
             // this.institutes.onLine=this.onLine;
             this.institutes.description=this.log.description;
             this.log.clientInstitutesId=this.institutes.id;
             this.log.clientInstitutesName=this.institutes.name;
             this.institutes.intention=this.log.intention ;
+            this.log.trackDoingsId=this.log.trackDoings
+            this.log.businessTrackDoingsId=this.log.businessTrackDoings
+            let tagObj= this.allTagList.find(function(obj){
+              if(obj.code==thisLog.log.trackDoings){
+                return obj;
+              }
+            });
+            this.log.trackDoings=tagObj.name;
+            let businessObj= this.businessTagList.find(function(obj){
+              if(obj.code==thisLog.log.businessTrackDoings){
+                return obj;
+              }
+            });
+            this.log.businessTrackDoings=businessObj.name;
+            this.log.contactPerson=this.log.contactPerson.join("/");
             api.updateByOnLine(this.institutes).then(()=>{
               logApi.add(this.log).then(()=>{
                 this.$message.success("添加成功");
@@ -999,6 +1048,9 @@
                   clientInstitutesName:null,
                   entryPerson:null,
                   trackDoings:null,
+                  trackDoingsId:null,
+                  businessTrackDoingsId:null,
+                  businessTrackDoings:null,
                   contactPerson:null,
                   img:null,
                   attachment:null,
@@ -1052,17 +1104,17 @@
         }
       },
 
-      uploadContractAttachment(res, file) {
-        if (res.status === 0) {
-          this.log.contractAttachment = res.data;
-        } else {
-          this.$message({
-            message: "上传文件失败",
-            type: "error",
-            duration: 5 * 1000
-          })
-        }
-      },
+      // uploadContractAttachment(res, file) {
+      //   if (res.status === 0) {
+      //     this.log.contractAttachment = res.data;
+      //   } else {
+      //     this.$message({
+      //       message: "上传文件失败",
+      //       type: "error",
+      //       duration: 5 * 1000
+      //     })
+      //   }
+      // },
       clearUploadedAttachment () {
         this.$refs.upload.clearFiles();
         this.log.contractAttachment = null;
