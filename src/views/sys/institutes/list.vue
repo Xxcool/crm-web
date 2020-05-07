@@ -975,6 +975,7 @@
             return obj;
           }
         });
+        this.log.businessTrackDoings=null;
         this.filterTagList=this.businessTagList.filter(item=>item.sort>=businessObj.sort);
       },
       handleCreateLog(val){
