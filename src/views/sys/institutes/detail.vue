@@ -961,6 +961,15 @@
         });
       },
       tagCommit(){
+        for(var i=0;i<this.tagList.length;i++){
+          if(this.tagList[i].checked){
+            if(this.tagList[i].parentCode==null||this.tagList[i].parentCode==""){
+              this.$message.warning("勾选的业务标签开发进度必须选择");
+              return;
+
+            }
+          }
+        }
         let tagTreeObj={
           id:this.$route.query.id,
           tagTrees:this.tagList
