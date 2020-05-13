@@ -966,7 +966,6 @@
             if(this.tagList[i].parentCode==null||this.tagList[i].parentCode==""){
               this.$message.warning("勾选的业务标签开发进度必须选择");
               return;
-
             }
           }
         }

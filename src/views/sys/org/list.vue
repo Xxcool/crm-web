@@ -22,7 +22,7 @@
         <el-form-item label="机构名称" prop="name">
           <el-input v-model="temp.name"/>
         </el-form-item>
-        <el-form-item label="客户标签">
+        <!-- <el-form-item label="客户标签">
           <el-tree
             ref="tagTree"
             :data="tagList"
@@ -31,7 +31,7 @@
             :default-checked-keys="tagCodes"
             :props="props">
           </el-tree>
-        </el-form-item>
+        </el-form-item> -->
 
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -44,7 +44,7 @@
 
 <script>
   import api from "../../../api/sys/org"
-  import tag from "../../../api/sys/tag"
+  // import tag from "../../../api/sys/tag"
 
   export default {
     name: 'menu_list',
@@ -58,7 +58,7 @@
           }
         ],
         data: [],
-        tagList:[],
+        // tagList:[],
         tagCodes:[],
         props:{
           label:"name"
@@ -105,10 +105,10 @@
         })
       },
       handleCreate(row) {
-        tag.getOrgTagTree(row.code).then(res=>{
-          this.tagList=res.data;
-          this.tagCodes=[];
-        });
+        // tag.getOrgTagTree(row.code).then(res=>{
+        //   this.tagList=res.data;
+        //   this.tagCodes=[];
+        // });
        this.dialogFormVisible = true
         this.dialogType = "create"
         this.temp = {
@@ -121,19 +121,19 @@
         }
       },
       handleUpdate(row) {
-        tag.getOrgTagTree(row.code).then(res=>{
-          this.tagList=res.data;
-          let tagCodes=[];
-          for (let i=0;i<res.data.length;i++){
-            let tag=res.data[i];
-            if(tag.checked){
-              tagCodes.push(tag.code);
-            }
-            tagCodes=tagCodes.concat(this.getCheckedTagCodes(tag))
-          }
-          console.log(tagCodes);
-          this.tagCodes=tagCodes;
-        });
+        // tag.getOrgTagTree(row.code).then(res=>{
+        //   this.tagList=res.data;
+        //   let tagCodes=[];
+        //   for (let i=0;i<res.data.length;i++){
+        //     let tag=res.data[i];
+        //     if(tag.checked){
+        //       tagCodes.push(tag.code);
+        //     }
+        //     tagCodes=tagCodes.concat(this.getCheckedTagCodes(tag))
+        //   }
+        //   console.log(tagCodes);
+        //   this.tagCodes=tagCodes;
+        // });
         this.dialogFormVisible = true
         this.dialogType = "edit"
         this.temp = Object.assign({}, row)
@@ -188,7 +188,7 @@
         });
       },
       createData() {
-       this.temp.tagCodes=this.$refs.tagTree.getCheckedKeys();
+       // this.temp.tagCodes=this.$refs.tagTree.getCheckedKeys();
         api.add(this.temp).then(() => {
           this.dialogFormVisible = false
           this.$message({
@@ -205,7 +205,7 @@
         })
       },
       updateData() {
-        this.temp.tagCodes=this.$refs.tagTree.getCheckedKeys();
+        // this.temp.tagCodes=this.$refs.tagTree.getCheckedKeys();
         api.update(this.temp).then(() => {
           this.dialogFormVisible = false
           this.$message({

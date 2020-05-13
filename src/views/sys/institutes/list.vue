@@ -2,35 +2,35 @@
   <div>
     <div class="tools">
       <el-form ref="searchForm" :inline="true" :model="filter" size="small">
-        <el-form-item label="组织机构">
-          <select-tree  :options="selOrgTree" @selected="changeOrg()" v-model="orgCode"
-                        :props="{
-                            parent: 'parentCode',
-                            value: 'code',
-                            label: 'name',
-                            children: 'children',
-                          }"
-          />
-        </el-form-item>
-        <br>
-
-
-        <el-form-item label="客户标签">
-
-          <el-tag
-            v-for="tag in selectTag"
-            :key="tag.name"
-            type="danger"
-            style="margin-left: 10px"
-          >
-            {{tag.name}}
-          </el-tag>
+        <el-form-item label="业务范围">
+          <el-select
+            v-model="filter.params.businessTag"
+            multiple
+            collapse-tags
+            placeholder="请选择">
+            <el-option
+              v-for="item in developTag"
+              :key="item.code"
+              :label="item.name"
+              :value="item.code">
+            </el-option>
+          </el-select>
         </el-form-item>
 
-        <el-form-item >
-          <el-button @click="findTagTree()"  type="primary">选择标签</el-button>
+        <el-form-item label="开发进度">
+          <el-select
+            v-model="filter.params.developTag"
+            multiple
+            collapse-tags
+            placeholder="请选择">
+            <el-option
+              v-for="item in businessTag"
+              :key="item.code"
+              :label="item.name"
+              :value="item.code">
+            </el-option>
+          </el-select>
         </el-form-item>
-        <br>
 
         <el-form-item label="上线合同签订日期">
           <el-date-picker v-model="filter.params.signBeginTime" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
@@ -584,7 +584,7 @@
   import tag from "../../../api/sys/tag"
   import station from "../../../api/sys/station"
   import user from "../../../api/sys/user"
-  import selectTree from '../../../components/selectTree/index.vue'
+  // import selectTree from '../../../components/selectTree/index.vue'
   import store from '../../../store/index'
   import logApi from "../../../api/sys/log"
   import contact from "../../../api/sys/contact"
@@ -592,7 +592,7 @@
 
   export default {
     name: "list",
-    components: {selectTree},
+    // components: {selectTree},
     data() {
       return {
         fileList: [],
@@ -605,6 +605,8 @@
           anotherName:[{required:true,message:'不能为空',trigger:'change'}],
           remark:[{required:true,message:'院所描述不能为空',trigger:'change'}]
         },
+        businessTag:[],
+        developTag:[],
         filter: {
           count: 10, // 页大小
           page: 1, // 当前页
@@ -620,6 +622,8 @@
             onLine:null,
             enter:null,
             tagCodes:[],
+            businessTag:[],
+            developTag:[]
           }
         },
         total: 0,
@@ -689,11 +693,6 @@
         orgList:[],
         userList:[],
         selOrgTree:[],
-        tagList:[],
-
-
-        selectTag:[
-        ],
         tagTree:[
         ],
         optionsTree: {
@@ -708,7 +707,7 @@
         filterTagList:[],
         contactList:[],
         cascaderList:[],
-        orgCode:null,
+        // orgCode:null,
         // showContract:false,
         props:{
           children: 'children',
@@ -759,6 +758,13 @@
           this.filter.params.state = this.areaList[0];
           this.filter.params.city = this.areaList[1];
         }
+        this.filter.params.tagCodes=[];
+        if(this.filter.params.businessTag!=null&&typeof this.filter.params.businessTag!="undefined"){
+          this.filter.params.tagCodes=this.filter.params.businessTag;
+        }
+        if(this.filter.params.developTag!=null&&typeof this.filter.params.developTag!="undefined"){
+          this.filter.params.tagCodes=this.filter.params.tagCodes.concat(this.filter.params.developTag);
+        }
         api.list(this.filter).then(res => {
           this.tableData = res.data.results;
           this.total = res.data.count
@@ -769,6 +775,15 @@
         this.typeList = api.typeList();
         this.getOrgTree();
         this.getAllUser();
+        this.findTag();
+      },
+      findTag(){
+        tag.tree(0).then(res => {
+          this.businessTag = res.data;
+        });
+        tag.tree(1).then(res => {
+          this.developTag = res.data;
+        });
       },
       getOrgSelectTree(){
         org.tree().then(res =>{
@@ -943,27 +958,16 @@
           return value.id
         });
       },
-
-      findTagTree(){
-
-        this.dialogTagTreeVisible = true;
-      },
       chooseTag(){
-        // console.info(this.checkedIds);
-
-        this.selectTag = this.$refs.tree.getCheckedNodes();
         this.filter.params.tagCodes = this.$refs.tree.getCheckedKeys();
         this.dialogTagTreeVisible = false;
-        console.info(this.filter.params.tagCodes );
       },
-      changeOrg(){
-        this.selectTag = [];
-        this.filter.params.tagCodes=[];
-        this.filter.params.tagCodes=[];
-        tag.findOrgTag(this.orgCode).then(res=>{
-          this.tagTree=res.data;
-        })
-      },
+      // changeOrg(){
+      //   this.filter.params.tagCodes=[];
+      //   tag.findOrgTag(this.orgCode).then(res=>{
+      //     this.tagTree=res.data;
+      //   })
+      // },
       developChange(val){
         let tagObj= this.allTagList.find(function(obj){
           if(obj.code==val){
