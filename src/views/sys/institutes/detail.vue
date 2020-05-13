@@ -472,25 +472,33 @@
             <el-option :value="1" label="女"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="部门/职务" prop="departmentId">
-          <el-select v-model="contactData.departmentId"  placeholder="请选择部门" @change="departmentChange">
-            <el-option
-              v-for="item in department"
-              :key="item.id"
-              :label="item.department"
-              :value="item.id">
-            </el-option>
-          </el-select>
-          <el-select v-model="contactData.jobTitleId" placeholder="请选择职务">
-            <el-option
-              v-for="item in jobTitle"
-              :key="item.id"
-              :label="item.jobTitle"
-              :value="item.id">
-            </el-option>
-          </el-select>
+        <el-form-item label="部门/职务" required>
+          <el-col :span="8">
+            <el-form-item prop="departmentId">
+              <el-select v-model="contactData.departmentId"  placeholder="请选择部门" @change="departmentChange">
+                <el-option
+                  v-for="item in department"
+                  :key="item.id"
+                  :label="item.department"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+           </el-col>
+           <el-col :span="8">
+             <el-form-item prop="jobTitleId">
+              <el-select v-model="contactData.jobTitleId" placeholder="请选择职务">
+                <el-option
+                  v-for="item in jobTitle"
+                  :key="item.id"
+                  :label="item.jobTitle"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-form-item>
-        <el-form-item label="手机">
+        <el-form-item label="手机" required>
           <el-input v-model="contactData.mobile"></el-input>
         </el-form-item>
         <el-form-item label="邮箱">
@@ -502,7 +510,7 @@
         <el-form-item label="微信号">
           <el-input v-model="contactData.weChat"></el-input>
         </el-form-item>
-        <el-form-item label="座机">
+        <el-form-item label="座机" required>
           <el-input v-model="contactData.phoneNumber"></el-input>
         </el-form-item>
         <el-form-item label="生日">
@@ -852,17 +860,21 @@
 
       },
       createContactData() {
-        if((this.contactData.mobile==null||this.contactData.mobile==""||typeof this.contactData.mobile=="undefined")&&
-            (this.contactData.phoneNumber==null||this.contactData.phoneNumber==""||typeof this.contactData.phoneNumber=="undefined")){
-          this.$message.error("手机号和座机号必须填写一个");
-          return;
-        }
-        this.contactData.clientInstitutesId = this.clientInstitutesId;
-        contact.add(this.contactData).then(() => {
-          this.$message.success("添加成功");
-          this.loadContactData();
-          this.dialogContactFormVisible = false;
-        }).catch(() => {
+        this.$refs.contactForm.validate(valid => {
+          if (valid) {
+            if((this.contactData.mobile==null||this.contactData.mobile==""||typeof this.contactData.mobile=="undefined")&&
+                (this.contactData.phoneNumber==null||this.contactData.phoneNumber==""||typeof this.contactData.phoneNumber=="undefined")){
+              this.$message.error("手机号和座机号必须填写一个");
+              return;
+            }
+            this.contactData.clientInstitutesId = this.clientInstitutesId;
+            contact.add(this.contactData).then(() => {
+              this.$message.success("添加成功");
+              this.loadContactData();
+              this.dialogContactFormVisible = false;
+            }).catch(() => {
+            })
+          }
         })
       },
       dialogContactForm() {
