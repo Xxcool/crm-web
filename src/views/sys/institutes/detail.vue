@@ -977,7 +977,9 @@
         api.addTagTree(tagTreeObj).then(res => {
           if(res.status==0){
             this.$message.success("客户标签添加成功");
-            this.loadContactData();
+            this.$store.dispatch("delView", this.$route).then(() => {
+              this.$router.push({name: "institutes_list", params: {noKeep: true}})
+            })
             return;
           }
           this.$message.warning("客户标签添加失败");
@@ -1229,47 +1231,6 @@
         }
         debugger
         this.areas = values;
-      },
-
-      loadArea(areas){
-        app.provinces().then(res1 => {
-          /*this.options = res.data*/
-          this.options = [];
-          let index = 0;
-          for (let i = 0; i < res1.data.length; i++) {
-            var data = {
-              dataValue: res1.data[i].value,
-              value: index++,
-              label: res1.data[i].label,
-              children: null
-            }
-            if (areas.length > 0) {
-              if (data.dataValue === areas[0]) {
-                this.areaSelect.push(data.value);
-              }
-            }
-            if (res1.data[i].children || res1.data[i].children.length > 0) {
-              data.children = [];
-              for (let j = 0; j < res1.data[i].children.length; j++) {
-                let subData = {
-                  dataValue: res1.data[i].children[j].value,
-                  value: index++,
-                  label: res1.data[i].children[j].label,
-                  children: null
-                };
-                data.children.push(subData)
-                if (areas.length > 1) {
-                  if (subData.dataValue === areas[1]) {
-                    this.areaSelect.push(subData.value);
-                  }
-                }
-              }
-            }
-            this.options.push(data)
-          }
-        }).catch(() => {
-        });
-      },
-
+      }
   }
 </script>
