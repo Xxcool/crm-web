@@ -462,7 +462,7 @@
     </el-tabs>
 
     <el-dialog :title="contactTitle[titleType]" width="40%" :visible.sync="dialogContactFormVisible">
-      <el-form ref="contactForm" label-width="80px" :model="contactData" :rules="rules" :disabled="contactDisabled">
+      <el-form ref="contactForm" label-width="80px" :model="contactData" :rules="contactRules" :disabled="contactDisabled">
         <el-form-item label="姓名" prop="name">
           <el-input v-model="contactData.name"></el-input>
         </el-form-item>
@@ -472,7 +472,7 @@
             <el-option :value="1" label="女"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="部门/职务">
+        <el-form-item label="部门/职务" prop="departmentId">
           <el-select v-model="contactData.departmentId"  placeholder="请选择部门" @change="departmentChange">
             <el-option
               v-for="item in department"
@@ -705,9 +705,11 @@
           departmentId:null
         },
         contactDatas: [],
-        rules: {
+        contactRules: {
           name: [{required: true, message: '不能为空', trigger: 'change'}],
-          sex: [{required: true, message: '不能为空', trigger: 'change'}]
+          sex: [{required: true, message: '不能为空', trigger: 'change'}],
+          departmentId:[{required: true, message: '不能为空', trigger: 'change'}],
+          jobTitleId:[{required: true, message: '不能为空', trigger: 'change'}]
         },
         contactTitle: {
           create: '新增联系人',

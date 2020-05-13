@@ -962,12 +962,6 @@
         this.filter.params.tagCodes = this.$refs.tree.getCheckedKeys();
         this.dialogTagTreeVisible = false;
       },
-      // changeOrg(){
-      //   this.filter.params.tagCodes=[];
-      //   tag.findOrgTag(this.orgCode).then(res=>{
-      //     this.tagTree=res.data;
-      //   })
-      // },
       developChange(val){
         let tagObj= this.allTagList.find(function(obj){
           if(obj.code==val){
