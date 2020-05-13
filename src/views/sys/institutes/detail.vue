@@ -201,8 +201,8 @@
                 <el-card>
                   <div class="info-title"><span class="padding-rigth">{{item.created}}</span>
                     <span class="padding-rigth">录入人：{{item.entryPerson}}</span>
-                    <span class="padding-rigth">开发跟踪行为：{{item.trackDoings}}</span>
-                    <span class="padding-rigth">业务跟踪行为：{{item.businessTrackDoings}}</span>
+                    <span class="padding-rigth">开发范围：{{item.trackDoings}}</span>
+                    <span class="padding-rigth">业务进度：{{item.businessTrackDoings}}</span>
                     <span class="padding-rigth">客户联系人：{{item.contactPerson}}</span>
                     <span class="padding-rigth" v-if="item.visitType === 0">拜访形式：电话</span>
                     <span class="padding-rigth" v-if="item.visitType === 1">拜访形式：微信</span>
