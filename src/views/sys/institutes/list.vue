@@ -4,12 +4,12 @@
       <el-form ref="searchForm" :inline="true" :model="filter" size="small">
         <el-form-item label="业务范围">
           <el-select
-            v-model="filter.params.businessTag"
+            v-model="filter.params.businessTagIds"
             multiple
             collapse-tags
             placeholder="请选择">
             <el-option
-              v-for="item in developTag"
+              v-for="item in businessTag"
               :key="item.code"
               :label="item.name"
               :value="item.code">
@@ -19,12 +19,12 @@
 
         <el-form-item label="开发进度">
           <el-select
-            v-model="filter.params.developTag"
+            v-model="filter.params.developTagIds"
             multiple
             collapse-tags
             placeholder="请选择">
             <el-option
-              v-for="item in businessTag"
+              v-for="item in developTag"
               :key="item.code"
               :label="item.name"
               :value="item.code">
@@ -622,8 +622,8 @@
             onLine:null,
             enter:null,
             tagCodes:[],
-            businessTag:[],
-            developTag:[]
+            businessTagIds:[],
+            developTagIds:[]
           }
         },
         total: 0,
@@ -758,13 +758,6 @@
           this.filter.params.state = this.areaList[0];
           this.filter.params.city = this.areaList[1];
         }
-        this.filter.params.tagCodes=[];
-        if(this.filter.params.businessTag!=null&&typeof this.filter.params.businessTag!="undefined"){
-          this.filter.params.tagCodes=this.filter.params.businessTag;
-        }
-        if(this.filter.params.developTag!=null&&typeof this.filter.params.developTag!="undefined"){
-          this.filter.params.tagCodes=this.filter.params.tagCodes.concat(this.filter.params.developTag);
-        }
         api.list(this.filter).then(res => {
           this.tableData = res.data.results;
           this.total = res.data.count
@@ -779,10 +772,10 @@
       },
       findTag(){
         tag.tree(0).then(res => {
-          this.businessTag = res.data;
+          this.developTag = res.data;
         });
         tag.tree(1).then(res => {
-          this.developTag = res.data;
+           this.businessTag= res.data;
         });
       },
       getOrgSelectTree(){
