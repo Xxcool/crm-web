@@ -899,6 +899,7 @@
           this.contactData.email = '***********'
           this.contactData.mobile = '***********'
         }
+        this.findJobTitle(scope.row.departmentId);
         this.titleType = 'view';
         this.showContact = false;
         this.contactDisabled = true;
