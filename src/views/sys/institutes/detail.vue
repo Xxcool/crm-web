@@ -648,9 +648,7 @@
         },
         typeList: [],
         tagList: [],
-        businessTagList:[],
         filterTagList:[],
-        contactList:[],
         cascaderList:[],
         props: {
           label: "name"
@@ -910,6 +908,7 @@
       handelContactUpdate(scope) {
         this.beforeContact();
         this.contactDisabled = false;
+        this.findJobTitle(scope.row.departmentId);
         this.contactData = scope.row;
         this.titleType = 'update';
         this.showContact = true;
