@@ -201,8 +201,8 @@
                 <el-card>
                   <div class="info-title"><span class="padding-rigth">{{item.created}}</span>
                     <span class="padding-rigth">录入人：{{item.entryPerson}}</span>
-                    <span class="padding-rigth">开发跟踪行为：{{item.trackDoings}}</span>
-                    <span class="padding-rigth">业务跟踪行为：{{item.businessTrackDoings}}</span>
+                    <span class="padding-rigth">开发范围：{{item.trackDoings}}</span>
+                    <span class="padding-rigth">业务进度：{{item.businessTrackDoings}}</span>
                     <span class="padding-rigth">客户联系人：{{item.contactPerson}}</span>
                     <span class="padding-rigth" v-if="item.visitType === 0">拜访形式：电话</span>
                     <span class="padding-rigth" v-if="item.visitType === 1">拜访形式：微信</span>
@@ -462,7 +462,7 @@
     </el-tabs>
 
     <el-dialog :title="contactTitle[titleType]" width="40%" :visible.sync="dialogContactFormVisible">
-      <el-form ref="contactForm" label-width="80px" :model="contactData" :rules="rules" :disabled="contactDisabled">
+      <el-form ref="contactForm" label-width="80px" :model="contactData" :rules="contactRules" :disabled="contactDisabled">
         <el-form-item label="姓名" prop="name">
           <el-input v-model="contactData.name"></el-input>
         </el-form-item>
@@ -472,25 +472,33 @@
             <el-option :value="1" label="女"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="部门/职务">
-          <el-select v-model="contactData.departmentId"  placeholder="请选择部门" @change="departmentChange">
-            <el-option
-              v-for="item in department"
-              :key="item.id"
-              :label="item.department"
-              :value="item.id">
-            </el-option>
-          </el-select>
-          <el-select v-model="contactData.jobTitleId" placeholder="请选择职务">
-            <el-option
-              v-for="item in jobTitle"
-              :key="item.id"
-              :label="item.jobTitle"
-              :value="item.id">
-            </el-option>
-          </el-select>
+        <el-form-item label="部门/职务" required>
+          <el-col :span="8">
+            <el-form-item prop="departmentId">
+              <el-select v-model="contactData.departmentId"  placeholder="请选择部门" @change="departmentChange">
+                <el-option
+                  v-for="item in department"
+                  :key="item.id"
+                  :label="item.department"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+           </el-col>
+           <el-col :span="8">
+             <el-form-item prop="jobTitleId">
+              <el-select v-model="contactData.jobTitleId" placeholder="请选择职务">
+                <el-option
+                  v-for="item in jobTitle"
+                  :key="item.id"
+                  :label="item.jobTitle"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-form-item>
-        <el-form-item label="手机">
+        <el-form-item label="手机" required>
           <el-input v-model="contactData.mobile"></el-input>
         </el-form-item>
         <el-form-item label="邮箱">
@@ -502,7 +510,7 @@
         <el-form-item label="微信号">
           <el-input v-model="contactData.weChat"></el-input>
         </el-form-item>
-        <el-form-item label="座机">
+        <el-form-item label="座机" required>
           <el-input v-model="contactData.phoneNumber"></el-input>
         </el-form-item>
         <el-form-item label="生日">
@@ -526,18 +534,26 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="客户行为跟踪" width="40%" :visible.sync="dialogLogFormVisible">
-      <el-form ref="logForm" label-width="80px" :model="log">
-        <el-form-item label="跟踪行为">
-          <el-select v-model="log.adTrackDoings" clearable>
-            <el-option v-for="item in allTagList" :key="item.name" :value="item.name" :label="item.name"></el-option>
+    <el-dialog title="客户行为跟踪" width="40%" :visible.sync="dialogLogFormVisible" @close='closeDialog'>
+      <el-form ref="logForm" label-width="80px" :model="log" :rules="logFormRules">
+        <el-form-item label="业务范围" prop="trackDoings">
+          <el-select v-model="log.trackDoings" clearable @change="developChange($event)">
+            <el-option v-for="item in allTagList" :key="item.code" :value="item.code" :label="item.name"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="结果描述">
+        <el-form-item label="开展进度" prop="businessTrackDoings">
+          <el-select v-model="log.businessTrackDoings" clearable>
+            <el-option v-for="item in filterTagList" :key="item.code" :value="item.code" :label="item.name"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="结果描述" prop="description">
           <el-input type="textarea" v-model="log.description"></el-input>
         </el-form-item>
+        <el-form-item label="跟踪日期" prop="trackDate">
+          <el-date-picker v-model="log.trackDate" type="date" value-format="yyyy-MM-dd" placeholder="选择日期时间"></el-date-picker>
+        </el-form-item>
         <el-form-item label="备注">
-          <el-input v-model="log.remark"></el-input>
+          <el-input  v-model="log.remark"></el-input>
         </el-form-item>
         <el-form-item label="图片" prop="img">
           <el-upload
@@ -546,46 +562,45 @@
             class="avatar-uploader"
             :show-file-list="false"
             :on-success="handleUploadImgSuccess"
-            with-credentials>
+            with-credentials >
             <img v-if="log.img" :src="log.img" class="avatar" title="点击替换图标">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
         <el-form-item label="附件文件">
-          <el-upload
-            action="/api/common/upload/1"
-            accept="file/*"
-            class="avatar-uploader"
-            :show-file-list="false"
-            :on-success="handleUploadAttachmentSuccess"
-            with-credentials>
-            <img v-if="log.attachment" :src="log.attachment" class="avatar" title="点击重新上传">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          <el-upload class="upload-demo" v-if="dialogLogFormVisible" ref="upload" action="/api/common/upload/1"
+                     :on-success="uploadAttachment" :multiple=false>
+            <el-button slot="trigger" size="small" type="primary" @click="clearUploadedImage">点击上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item label="上线合同">
-          <el-upload
-            action="/api/common/upload/1"
-            accept="file/*"
-            class="avatar-uploader"
-            :show-file-list="false"
-            :on-success="handleUploadContractSuccess"
-            with-credentials>
-            <img v-if="log.contractAttachment" :src="log.contractAttachment" class="avatar" title="点击重新上传">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
+        <el-form-item label="联系人选择" prop="contactPerson">
+          <el-cascader
+              v-model="log.contactPerson"
+              :options="cascaderList" :show-all-levels="false"></el-cascader>
         </el-form-item>
-        <el-form-item label="联系人选择">
-          <el-select v-model="log.contactPerson" clearable>
-            <el-option v-for="item in contactList" :key="item.name" :value="item.name" :label="item.name">
-              {{item.name}}
-            </el-option>
+        <el-form-item label="拜访形式" prop="visitType">
+          <el-select v-model="log.visitType" clearable>
+            <el-option label="电话" :value="0"></el-option>
+            <el-option label="微信" :value="1"></el-option>
+            <el-option label="面访" :value="2"></el-option>
           </el-select>
         </el-form-item>
+
+        <el-form-item label=" 意向度">
+          <el-select v-model="log.intention" placeholder="请选择">
+            <el-option label="一个月内签约" :value="0"></el-option>
+            <el-option label="三个月内签约" :value="1"></el-option>
+            <el-option label="高合作意向" :value="2"></el-option>
+            <el-option label="有了解意愿" :value="3"></el-option>
+            <el-option label="拒绝/排斥合作" :value="4"></el-option>
+          </el-select>
+        </el-form-item>
+
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogLogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="commitLogData">确 定</el-button>
+        <el-button type="primary" @click="commitLogData" >确 定</el-button>
       </div>
     </el-dialog>
 
@@ -623,9 +638,20 @@
           contractSignTime:null,
           contractEndTime:null
         },
+        logFormRules: {
+          trackDoings: [{required: true, message: '不能为空', trigger: 'change'}],
+          businessTrackDoings: [{required: true, message: '不能为空', trigger: 'change'}],
+          visitType: [{required: true, message: '请选择拜访形式', trigger: 'change'}],
+          description: [{required: true, message: '请填写客户行为跟踪', trigger: 'change'}],
+          trackDate: [{required: true, message: '请填写跟踪日期', trigger: 'change'}],
+          contactPerson: [{required: true, message: '请选择联系人', trigger: 'change'}],
+        },
         typeList: [],
         tagList: [],
         businessTagList:[],
+        filterTagList:[],
+        contactList:[],
+        cascaderList:[],
         props: {
           label: "name"
         },
@@ -667,6 +693,7 @@
         contactTotal: 0,
         contactList: [],
         allTagList: [],
+        businessTagList:[],
         contactData: {
           id: null,
           addUserId: null,
@@ -686,9 +713,11 @@
           departmentId:null
         },
         contactDatas: [],
-        rules: {
+        contactRules: {
           name: [{required: true, message: '不能为空', trigger: 'change'}],
-          sex: [{required: true, message: '不能为空', trigger: 'change'}]
+          sex: [{required: true, message: '不能为空', trigger: 'change'}],
+          departmentId:[{required: true, message: '不能为空', trigger: 'change'}],
+          jobTitleId:[{required: true, message: '不能为空', trigger: 'change'}]
         },
         contactTitle: {
           create: '新增联系人',
@@ -831,17 +860,21 @@
 
       },
       createContactData() {
-        if((this.contactData.mobile==null||this.contactData.mobile==""||typeof this.contactData.mobile=="undefined")&&
-            (this.contactData.phoneNumber==null||this.contactData.phoneNumber==""||typeof this.contactData.phoneNumber=="undefined")){
-          this.$message.error("手机号和座机号必须填写一个");
-          return;
-        }
-        this.contactData.clientInstitutesId = this.clientInstitutesId;
-        contact.add(this.contactData).then(() => {
-          this.$message.success("添加成功");
-          this.loadContactData();
-          this.dialogContactFormVisible = false;
-        }).catch(() => {
+        this.$refs.contactForm.validate(valid => {
+          if (valid) {
+            if((this.contactData.mobile==null||this.contactData.mobile==""||typeof this.contactData.mobile=="undefined")&&
+                (this.contactData.phoneNumber==null||this.contactData.phoneNumber==""||typeof this.contactData.phoneNumber=="undefined")){
+              this.$message.error("手机号和座机号必须填写一个");
+              return;
+            }
+            this.contactData.clientInstitutesId = this.clientInstitutesId;
+            contact.add(this.contactData).then(() => {
+              this.$message.success("添加成功");
+              this.loadContactData();
+              this.dialogContactFormVisible = false;
+            }).catch(() => {
+            })
+          }
         })
       },
       dialogContactForm() {
@@ -961,6 +994,14 @@
         });
       },
       tagCommit(){
+        for(var i=0;i<this.tagList.length;i++){
+          if(this.tagList[i].checked){
+            if(this.tagList[i].parentCode==null||this.tagList[i].parentCode==""){
+              this.$message.warning("勾选的业务标签开发进度必须选择");
+              return;
+            }
+          }
+        }
         let tagTreeObj={
           id:this.$route.query.id,
           tagTrees:this.tagList
@@ -968,7 +1009,9 @@
         api.addTagTree(tagTreeObj).then(res => {
           if(res.status==0){
             this.$message.success("客户标签添加成功");
-            this.loadContactData();
+            this.$store.dispatch("delView", this.$route).then(() => {
+              this.$router.push({name: "institutes_list", params: {noKeep: true}})
+            })
             return;
           }
           this.$message.warning("客户标签添加失败");
@@ -986,24 +1029,114 @@
         }).catch(() => {
         })
       },
-
+      closeDialog(){
+        this.$refs.logForm.resetFields();
+        this.dialogLogFormVisible=false;
+      },
+      uploadAttachment(res) {
+        if (res.status === 0) {
+          this.log.attachment = res.data;
+        } else {
+          this.$message({
+            message: "上传文件失败",
+            type: "error",
+            duration: 5 * 1000
+          })
+        }
+      },
+      developChange(val){
+        let tagObj= this.allTagList.find(function(obj){
+          if(obj.code==val){
+            return obj;
+          }
+        });
+        let businessObj= this.businessTagList.find(function(obj){
+          if(obj.code==tagObj.parentCode){
+            return obj;
+          }
+        });
+        this.log.businessTrackDoings=null;
+        this.filterTagList=this.businessTagList.filter(item=>item.sort>=businessObj.sort);
+      },
+      clearUploadedImage () {
+        this.$refs.upload.clearFiles();
+        this.log.attachment = null;
+      },
       commitLogData() {
-        this.log.trackDoings = this.log.adTrackDoings;
-        this.log.clientInstitutesId = this.institutes.id;
-        this.log.clientInstitutesName = this.institutes.name;
-        logApi.add(this.log).then(() => {
-          this.$message.success("添加成功");
-          this.log = {};
-          this.dialogLogFormVisible = false;
-          this.loadContactData();
+        this.$refs.logForm.validate(valid => {
+          if (valid) {
+            let thisLog=this;
+            // this.institutes.onLine=this.onLine;
+            this.institutes.description=this.log.description;
+            this.log.clientInstitutesId=this.institutes.id;
+            this.log.clientInstitutesName=this.institutes.name;
+            this.institutes.intention=this.log.intention ;
+            this.log.trackDoingsId=this.log.trackDoings
+            this.log.businessTrackDoingsId=this.log.businessTrackDoings
+            let tagObj= this.allTagList.find(function(obj){
+              if(obj.code==thisLog.log.trackDoings){
+                return obj;
+              }
+            });
+            this.log.trackDoings=tagObj.name;
+            let businessObj= this.businessTagList.find(function(obj){
+              if(obj.code==thisLog.log.businessTrackDoings){
+                return obj;
+              }
+            });
+            this.log.businessTrackDoings=businessObj.name;
+            this.log.contactPerson=this.log.contactPerson.join("/");
+            api.updateByOnLine(this.institutes).then(()=>{
+              logApi.add(this.log).then(()=>{
+                this.$message.success("添加成功");
+                this.log={
+                  clientInstitutesId:null,
+                  clientInstitutesName:null,
+                  entryPerson:null,
+                  trackDoings:null,
+                  trackDoingsId:null,
+                  businessTrackDoingsId:null,
+                  businessTrackDoings:null,
+                  contactPerson:null,
+                  img:null,
+                  attachment:null,
+                  contractAttachment:null,
+                  remark:null,
+                  description:null
+                };
+                this.dialogLogFormVisible=false;
+                this.loadContactData();
+              })
+            }).catch(()=>{
+
+            })
+          }
         })
       },
       handleCreateLog() {
-        tag.allList().then(res => {
-          this.allTagList = res.data;
+        api.trackTag(this.$route.query.id,1).then(res=>{
+          this.allTagList=res.data;
         });
-        this.selectContactAll();
-        this.dialogLogFormVisible = true;
+        tag.tree(0).then(res => {
+          this.businessTagList = res.data;
+        });
+        contact.findCascader(this.$route.query.id).then(res=>{
+          this.cascaderList=res.data;
+        });
+        this.log = {
+          clientInstitutesId: null,
+          clientInstitutesName: null,
+          entryPerson: null,
+          trackDoings: null,
+          businessTrackDoings:null,
+          contactPerson: null,
+          img: null,
+          attachment: null,
+          contractAttachment: null,
+          remark: null,
+          description: null
+        };
+        this.dialogLogFormVisible=true;
       },
       goBack(state) {
         this.$store.dispatch("delView", this.$route).then(() => {
@@ -1220,47 +1353,6 @@
         }
         debugger
         this.areas = values;
-      },
-
-      loadArea(areas){
-        app.provinces().then(res1 => {
-          /*this.options = res.data*/
-          this.options = [];
-          let index = 0;
-          for (let i = 0; i < res1.data.length; i++) {
-            var data = {
-              dataValue: res1.data[i].value,
-              value: index++,
-              label: res1.data[i].label,
-              children: null
-            }
-            if (areas.length > 0) {
-              if (data.dataValue === areas[0]) {
-                this.areaSelect.push(data.value);
-              }
-            }
-            if (res1.data[i].children || res1.data[i].children.length > 0) {
-              data.children = [];
-              for (let j = 0; j < res1.data[i].children.length; j++) {
-                let subData = {
-                  dataValue: res1.data[i].children[j].value,
-                  value: index++,
-                  label: res1.data[i].children[j].label,
-                  children: null
-                };
-                data.children.push(subData)
-                if (areas.length > 1) {
-                  if (subData.dataValue === areas[1]) {
-                    this.areaSelect.push(subData.value);
-                  }
-                }
-              }
-            }
-            this.options.push(data)
-          }
-        }).catch(() => {
-        });
-      },
-
+      }
   }
 </script>
