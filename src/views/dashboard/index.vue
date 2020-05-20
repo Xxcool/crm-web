@@ -9,9 +9,9 @@
               </div>
               <div class="content">
                 <el-form>
-                  <el-form-item label="采购单位客户即将释放" class="">
+                  <!-- <el-form-item label="采购单位客户即将释放" class="">
                     <span class="status-1">{{boardData.releaseNum}}家</span>
-                  </el-form-item>
+                  </el-form-item> -->
                 </el-form>
               </div>
             </el-card>
