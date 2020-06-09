@@ -24,6 +24,28 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="业务范围">
+        <el-select v-model="filter.params.trackDoings" multiple collapse-tags placeholder="请选择" style="margin-left: 20px;">
+          <el-option v-for="item in tagList" :key="item.name" :label="item.name" :value="item.name"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="开发进度">
+        <el-select v-model="filter.params.businessTrackDoings" multiple collapse-tags placeholder="请选择" style="margin-left: 20px;">
+          <el-option v-for="item in businessTagList" :key="item.name" :label="item.name" :value="item.name"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="客户联系人部门/职务/姓名">
+        <el-cascader
+            v-model="filter.params.contact"
+            :options="cascaderList" :change-on-select="true"></el-cascader>
+      </el-form-item>
+      <el-form-item label="拜访形式">
+        <el-select v-model="filter.params.visitType" clearable>
+          <el-option label="电话" value="0"></el-option>
+          <el-option label="微信" value="1"></el-option>
+          <el-option label="面访" value="2"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="loadData">搜索</el-button>
         <el-button type="primary" @click="exportData">导出</el-button>
@@ -96,6 +118,8 @@
 <script>
   import api from "../../../api/sys/log"
   import {downloadFile} from "../../../utils"
+  import tag from "../../../api/sys/tag"
+  import contact from "../../../api/sys/contact"
 
   export default {
     name: "institutes_log",
@@ -110,12 +134,17 @@
           sort: '',
           order: '',
           params: {
-
+            trackDoings:[],
+            businessTrackDoings:[],
+            contact: []
           }
         },
         total: 0,
         loading: true,
         searchLoading: false,
+        tagList: [],
+        businessTagList:[],
+        cascaderList:[]
       }
     },
     created(){
@@ -126,6 +155,7 @@
         this.institutesList = res.data.results
       })
       this.loadData();
+      this.handleTag();
     },
     methods:{
       loadData(){
@@ -150,7 +180,19 @@
         api.exportData(this.filter.params).then(res => {
           downloadFile(res.data, "客户跟进日志")
         })
-      }
+      },
+      handleTag() {
+        tag.tree(1).then(res => {
+          this.tagList = res.data;
+        });
+        tag.tree(0).then(res => {
+          this.businessTagList = res.data;
+        });
+        contact.findCascader("").then(res=>{
+          this.cascaderList=res.data;
+        });
+      },
+
     }
   }
 </script>
